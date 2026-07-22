@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تاريخ العلوم | متحف رقمي تفاعلي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+:root{
+  --bg-void:#070911;
+  --bg-deep:#0b0e1c;
+  --bg-panel:#121629;
+  --bg-panel-2:#161b32;
+  --gold:#c9a24c;
+  --gold-bright:#e8c777;
+  --teal:#3fb8af;
+  --teal-dim:#2a7f79;
+  --parchment:#f2e6c9;
+  --rose:#c96a4c;
+  --text-1:#eee9f4;
+  --text-2:#a6acc7;
+  --text-3:#6c7295;
+  --line:rgba(201,162,76,0.18);
+  --glass:rgba(22,27,50,0.55);
+  --glass-brd:rgba(201,162,76,0.22);
+  --radius:18px;
+  --ease:cubic-bezier(.22,.8,.28,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg-void);
+  color:var(--text-1);
+  font-family:'IBM Plex Sans Arabic','Tajawal',sans-serif;
+  overflow-x:hidden;
+  line-height:1.75;
+}
+h1,h2,h3,h4,.display{font-family:'Tajawal','IBM Plex Sans Arabic',sans-serif;}
+.eyebrow{font-family:'Amiri',serif;}
+::selection{background:var(--gold);color:#0b0e1c;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+::-webkit-scrollbar{width:9px;}
+::-webkit-scrollbar-track{background:var(--bg-void);}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--gold),var(--teal));border-radius:10px;}
+
+/* ===== decorative background layers ===== */
+#stars-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+.grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 30%, transparent 40%, rgba(3,4,10,.75) 100%);
+}
+.geo-divider{width:100%;height:46px;display:flex;align-items:center;justify-content:center;gap:14px;opacity:.55;margin:6px 0;}
+.geo-divider span{display:block;width:6px;height:6px;transform:rotate(45deg);background:var(--gold);}
+.geo-divider .bar{width:70px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+
+/* ===== nav ===== */
+nav{
+  position:fixed;top:0;right:0;left:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 5vw;
+  background:rgba(7,9,17,.55);
+  backdrop-filter:blur(16px) saturate(140%);
+  -webkit-backdrop-filter:blur(16px) saturate(140%);
+  border-bottom:1px solid var(--line);
+  transition:padding .3s var(--ease);
+}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.15rem;letter-spacing:.5px;}
+.brand .mark{width:30px;height:30px;position:relative;}
+.brand .mark svg{width:100%;height:100%;}
+.nav-links{display:flex;gap:28px;font-size:.92rem;color:var(--text-2);}
+.nav-links a{position:relative;padding:4px 2px;transition:color .25s;}
+.nav-links a:hover, .nav-links a.active{color:var(--gold-bright);}
+.nav-links a::after{content:"";position:absolute;bottom:-3px;right:0;width:0;height:1px;background:var(--gold);transition:width .3s var(--ease);}
+.nav-links a:hover::after{width:100%;}
+.nav-search{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--line);
+  border-radius:999px;padding:8px 16px;min-width:210px;
+}
+.nav-search input{background:none;border:none;outline:none;color:var(--text-1);font-family:inherit;font-size:.85rem;width:100%;}
+.nav-search input::placeholder{color:var(--text-3);}
+.burger{display:none;flex-direction:column;gap:5px;padding:8px;}
+.burger span{width:22px;height:2px;background:var(--gold);}
+
+/* ===== hero ===== */
+header.hero{
+  position:relative;min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;padding:0 20px;z-index:2;
+}
+.hero-eyebrow{
+  font-family:'Amiri',serif;color:var(--gold-bright);letter-spacing:3px;
+  font-size:1rem;margin-bottom:22px;opacity:0;display:flex;align-items:center;gap:12px;
+}
+.hero-eyebrow .ln{width:38px;height:1px;background:var(--gold);}
+.hero h1{
+  font-size:clamp(3rem,9vw,7.2rem);font-weight:900;
+  background:linear-gradient(180deg,#fff 10%, var(--gold-bright) 55%, var(--gold) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  letter-spacing:2px;line-height:1.05;opacity:0;
+  filter:drop-shadow(0 0 40px rgba(201,162,76,.25));
+}
+.hero-sub{
+  margin-top:26px;font-size:clamp(1rem,2.1vw,1.35rem);color:var(--text-2);
+  max-width:640px;font-weight:300;opacity:0;
+}
+.hero-cta{
+  margin-top:52px;opacity:0;display:flex;gap:18px;align-items:center;flex-wrap:wrap;justify-content:center;
+}
+.btn-primary{
+  position:relative;padding:16px 42px;border-radius:999px;
+  background:linear-gradient(120deg,var(--gold) 0%, var(--gold-bright) 100%);
+  color:#0b0e1c;font-weight:700;font-size:1rem;overflow:hidden;
+  box-shadow:0 10px 40px -10px rgba(201,162,76,.6);
+  transition:transform .35s var(--ease), box-shadow .35s var(--ease);
+}
+.btn-primary:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 16px 50px -8px rgba(201,162,76,.75);}
+.btn-ghost{
+  padding:15px 34px;border-radius:999px;border:1px solid var(--glass-brd);
+  color:var(--text-2);font-size:.95rem;transition:all .3s var(--ease);
+}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold-bright);background:rgba(201,162,76,.06);}
+.scroll-cue{
+  position:absolute;bottom:38px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text-3);
+  font-size:.75rem;letter-spacing:2px;opacity:0;
+}
+.scroll-cue .dot{width:1px;height:36px;background:linear-gradient(var(--gold),transparent);position:relative;overflow:hidden;}
+.scroll-cue .dot::after{content:"";position:absolute;top:-36px;right:0;width:100%;height:36px;background:var(--gold-bright);animation:cueflow 2.2s infinite;}
+@keyframes cueflow{to{top:100%;}}
+
+/* ===== sections shared ===== */
+main{position:relative;z-index:2;}
+section{padding:120px 6vw;position:relative;}
+.sec-head{max-width:760px;margin:0 auto 70px;text-align:center;}
+.sec-eyebrow{
+  font-family:'Amiri',serif;color:var(--teal);letter-spacing:4px;font-size:.85rem;
+  display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:18px;
+}
+.sec-eyebrow .ln{width:30px;height:1px;background:var(--teal);}
+.sec-title{font-size:clamp(1.9rem,4vw,3rem);font-weight:800;margin-bottom:18px;}
+.sec-title em{font-style:normal;color:var(--gold-bright);}
+.sec-desc{color:var(--text-2);font-weight:300;font-size:1.05rem;}
+
+/* ===== timeline ===== */
+.eras{max-width:1100px;margin:0 auto;position:relative;}
+.eras::before{
+  content:"";position:absolute;top:0;bottom:0;right:calc(50% - .5px);width:1px;
+  background:linear-gradient(var(--gold) 0%, var(--teal) 100%);opacity:.35;
+}
+.era{
+  display:grid;grid-template-columns:1fr 60px 1fr;align-items:center;gap:0;margin-bottom:70px;opacity:0;transform:translateY(60px);
+}
+.era-card{
+  background:var(--glass);border:1px solid var(--glass-brd);border-radius:var(--radius);
+  padding:34px;backdrop-filter:blur(14px);position:relative;
+}
+.era:nth-child(odd) .era-card{grid-column:1;text-align:left;}
+.era:nth-child(even) .era-card{grid-column:3;text-align:left;}
+.era-node{grid-column:2;justify-self:center;width:16px;height:16px;border-radius:50%;
+  background:var(--gold-bright);box-shadow:0 0 0 6px rgba(201,162,76,.12),0 0 24px var(--gold);position:relative;}
+.era:nth-child(1) .era-card{grid-column:1;}
+.era:nth-child(1) > div:empty{grid-column:3;}
+.era-tag{font-size:.8rem;letter-spacing:2px;color:var(--teal);font-family:'Amiri',serif;margin-bottom:8px;}
+.era-card h3{font-size:1.5rem;margin-bottom:12px;}
+.era-card p{color:var(--text-2);font-size:.95rem;font-weight:300;}
+.era-span{color:var(--gold);font-size:.8rem;margin-top:14px;display:block;letter-spacing:1px;}
+
+/* ===== filter/search bar for scientists ===== */
+.filters{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:56px;}
+.chip{
+  padding:9px 20px;border-radius:999px;border:1px solid var(--glass-brd);
+  font-size:.85rem;color:var(--text-2);background:rgba(255,255,255,.02);transition:all .25s var(--ease);
+}
+.chip:hover{border-color:var(--gold);color:var(--gold-bright);}
+.chip.active{background:linear-gradient(120deg,var(--gold),var(--gold-bright));color:#0b0e1c;font-weight:700;border-color:transparent;}
+
+/* ===== scientists grid ===== */
+.grid-scientists{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:26px;max-width:1300px;margin:0 auto;
+}
+.card{
+  background:var(--glass);border:1px solid var(--glass-brd);border-radius:var(--radius);
+  padding:26px;position:relative;overflow:hidden;cursor:pointer;
+  transform:translateY(30px);opacity:0;
+  transition:transform .4s var(--ease), border-color .4s, box-shadow .4s;
+}
+.card::before{
+  content:"";position:absolute;inset:0;opacity:0;transition:opacity .4s;
+  background:radial-gradient(circle at 30% 0%, rgba(63,184,175,.14), transparent 60%);
+}
+.card:hover{transform:translateY(-8px);border-color:var(--gold);box-shadow:0 20px 50px -20px rgba(0,0,0,.6);}
+.card:hover::before{opacity:1;}
+.medallion{
+  width:78px;height:78px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:1.9rem;font-weight:800;color:#0b0e1c;margin-bottom:18px;position:relative;
+  box-shadow:0 8px 30px -8px rgba(0,0,0,.5);overflow:hidden;
+}
+.medallion::after{
+  content:"";position:absolute;inset:-5px;border-radius:50%;border:1px dashed rgba(255,255,255,.35);
+}
+.medallion img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.img-credit{color:var(--text-3);font-size:.72rem;text-align:center;margin-top:-6px;margin-bottom:6px;}
+.card h4{font-size:1.2rem;margin-bottom:6px;}
+.card .field{color:var(--teal);font-size:.82rem;margin-bottom:10px;}
+.card .years{color:var(--text-3);font-size:.78rem;letter-spacing:.5px;}
+.card .open-hint{
+  position:absolute;left:22px;bottom:22px;font-size:.78rem;color:var(--gold);opacity:0;
+  transform:translateX(-8px);transition:all .3s var(--ease);
+}
+.card:hover .open-hint{opacity:1;transform:translateX(0);}
+
+/* ===== network graph ===== */
+.network-wrap{max-width:1200px;margin:0 auto;background:var(--glass);border:1px solid var(--glass-brd);
+  border-radius:24px;padding:20px;backdrop-filter:blur(14px);}
+#network-svg{width:100%;height:600px;display:block;}
+.net-node circle{transition:r .25s,filter .25s;cursor:pointer;}
+.net-node text{fill:var(--text-2);font-size:11px;font-family:'IBM Plex Sans Arabic',sans-serif;pointer-events:none;transition:fill .25s;}
+.net-node.person circle{fill:var(--gold);}
+.net-node.field circle{fill:var(--teal);}
+.net-node.dim{opacity:.18;}
+.net-node.hi circle{filter:drop-shadow(0 0 10px currentColor);}
+.net-node.hi text{fill:var(--gold-bright);font-weight:700;}
+.net-edge{stroke:var(--text-3);stroke-width:1;opacity:.35;transition:all .25s;fill:none;}
+.net-edge.hi{stroke:var(--gold);opacity:1;stroke-width:1.6;}
+.net-legend{display:flex;gap:26px;justify-content:center;margin-top:14px;font-size:.82rem;color:var(--text-2);flex-wrap:wrap;}
+.net-legend span{display:inline-flex;align-items:center;gap:8px;}
+.net-legend i{width:10px;height:10px;border-radius:50%;display:inline-block;}
+
+/* ===== comparison ===== */
+.compare-picker{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:50px;}
+.compare-picker select{
+  background:var(--bg-panel);border:1px solid var(--glass-brd);color:var(--text-1);
+  padding:14px 20px;border-radius:12px;font-family:inherit;font-size:.95rem;min-width:220px;
+}
+.compare-table{max-width:1000px;margin:0 auto;border-collapse:separate;border-spacing:0;width:100%;}
+.compare-table th,.compare-table td{padding:18px 20px;border-bottom:1px solid var(--line);vertical-align:top;font-size:.92rem;}
+.compare-table th{text-align:center;position:sticky;top:70px;background:var(--bg-deep);}
+.compare-table td:first-child{color:var(--teal);font-weight:700;width:150px;white-space:nowrap;}
+.compare-head{text-align:center;padding:22px;}
+.compare-head .medallion{margin:0 auto 12px;}
+.compare-empty{text-align:center;color:var(--text-3);padding:60px 0;}
+
+/* ===== map ===== */
+.map-wrap{max-width:1100px;margin:0 auto;background:var(--glass);border:1px solid var(--glass-brd);border-radius:24px;padding:20px;position:relative;}
+#map-svg{width:100%;height:520px;display:block;}
+.map-dot{cursor:pointer;}
+.map-dot circle{fill:var(--gold);transition:r .2s;}
+.map-dot:hover circle{r:7;}
+.map-dot text{fill:var(--text-2);font-size:10px;}
+.map-tooltip{
+  position:absolute;pointer-events:none;background:var(--bg-panel);border:1px solid var(--gold);
+  border-radius:10px;padding:10px 14px;font-size:.82rem;opacity:0;transition:opacity .2s;transform:translate(-50%,-115%);
+  white-space:nowrap;z-index:5;
+}
+
+/* ===== quizzes ===== */
+.quiz-card{
+  background:var(--glass);border:1px solid var(--glass-brd);border-radius:var(--radius);
+  padding:26px;position:relative;cursor:pointer;transition:all .35s var(--ease);
+}
+.quiz-card:hover{transform:translateY(-6px);border-color:var(--teal);}
+.quiz-card.full{
+  grid-column:1/-1;background:linear-gradient(120deg, rgba(201,162,76,.14), rgba(63,184,175,.1));
+  display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+.quiz-card .qcount{color:var(--text-3);font-size:.8rem;margin-top:6px;}
+.quiz-card .qgo{color:var(--gold);font-size:.85rem;margin-top:14px;}
+.quiz-stage-panel{
+  max-width:760px;margin:50px auto 0;background:var(--glass);border:1px solid var(--glass-brd);
+  border-radius:24px;padding:38px;backdrop-filter:blur(14px);
+}
+.quiz-progress{height:5px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin-bottom:26px;}
+.quiz-progress-bar{height:100%;background:linear-gradient(90deg,var(--gold),var(--teal));transition:width .4s var(--ease);}
+.quiz-meta-row{display:flex;justify-content:space-between;color:var(--text-3);font-size:.82rem;margin-bottom:18px;}
+.quiz-level-tag{padding:3px 12px;border-radius:999px;border:1px solid var(--glass-brd);}
+.quiz-question{font-size:1.25rem;font-weight:700;margin-bottom:26px;line-height:1.6;}
+.quiz-options{display:flex;flex-direction:column;gap:12px;margin-bottom:30px;}
+.quiz-opt{
+  text-align:right;padding:16px 20px;border-radius:14px;border:1px solid var(--glass-brd);
+  background:rgba(255,255,255,.02);font-size:.98rem;transition:all .25s var(--ease);cursor:pointer;
+}
+.quiz-opt:hover{border-color:var(--gold);background:rgba(201,162,76,.07);}
+.quiz-opt.picked{border-color:var(--gold);background:rgba(201,162,76,.14);}
+.quiz-opt.correct-answer{border-color:#6cbf6c;background:rgba(108,191,108,.14);color:#bfe8bf;}
+.quiz-opt.wrong-answer{border-color:var(--rose);background:rgba(201,106,76,.14);color:#f0c4b4;}
+.quiz-opt[disabled], .quiz-opt.locked{pointer-events:none;}
+.quiz-nav-row{display:flex;justify-content:space-between;align-items:center;}
+.quiz-exit{color:var(--text-3);font-size:.85rem;}
+.quiz-results{max-width:760px;margin:50px auto 0;}
+.score-ring-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:40px;}
+.score-big{font-size:3.2rem;font-weight:900;background:linear-gradient(180deg,#fff,var(--gold-bright));-webkit-background-clip:text;background-clip:text;color:transparent;}
+.score-level{margin-top:10px;padding:8px 24px;border-radius:999px;font-weight:700;font-size:1rem;}
+.level-excellent{background:rgba(108,191,108,.16);color:#a4e0a4;border:1px solid rgba(108,191,108,.4);}
+.level-good{background:rgba(63,184,175,.16);color:#9fe0da;border:1px solid rgba(63,184,175,.4);}
+.level-fair{background:rgba(201,162,76,.16);color:var(--gold-bright);border:1px solid rgba(201,162,76,.4);}
+.level-weak{background:rgba(201,106,76,.16);color:#f0c4b4;border:1px solid rgba(201,106,76,.4);}
+.score-sub{color:var(--text-2);font-size:.92rem;margin-top:14px;text-align:center;max-width:480px;}
+.level-breakdown{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:40px;}
+.level-breakdown .lb-item{background:var(--glass);border:1px solid var(--glass-brd);border-radius:14px;padding:14px 22px;text-align:center;min-width:110px;}
+.level-breakdown .lb-item .n{font-size:1.4rem;font-weight:800;}
+.level-breakdown .lb-item .l{color:var(--text-3);font-size:.78rem;margin-top:4px;}
+.review-item{
+  background:var(--glass);border:1px solid var(--glass-brd);border-radius:16px;padding:22px 24px;margin-bottom:16px;
+}
+.review-item .rq{font-weight:700;margin-bottom:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.review-item .rq .tag{font-size:.72rem;padding:2px 10px;border-radius:999px;border:1px solid var(--glass-brd);color:var(--text-3);white-space:nowrap;}
+.review-item .ra{font-size:.9rem;padding:8px 0;color:var(--text-2);}
+.review-item .ra.ok{color:#a4e0a4;}
+.review-item .ra.bad{color:#f0c4b4;}
+.quiz-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:10px;}
+
+/* ===== detail overlay ===== */
+.overlay{
+  position:fixed;inset:0;z-index:200;background:rgba(6,7,14,.88);backdrop-filter:blur(6px);
+  opacity:0;pointer-events:none;transition:opacity .35s var(--ease);overflow-y:auto;
+}
+.overlay.open{opacity:1;pointer-events:auto;}
+.overlay-panel{
+  max-width:980px;margin:60px auto 100px;background:var(--bg-deep);border:1px solid var(--glass-brd);
+  border-radius:26px;overflow:hidden;transform:translateY(50px) scale(.97);opacity:0;transition:all .5s var(--ease);
+  box-shadow:0 40px 100px -20px rgba(0,0,0,.7);
+}
+.overlay.open .overlay-panel{transform:translateY(0) scale(1);opacity:1;}
+.overlay-close{
+  position:sticky;top:16px;float:left;margin:16px;z-index:5;width:42px;height:42px;border-radius:50%;
+  background:rgba(0,0,0,.4);border:1px solid var(--glass-brd);display:flex;align-items:center;justify-content:center;
+  font-size:1.2rem;color:var(--text-1);
+}
+.overlay-hero{padding:70px 50px 40px;text-align:center;position:relative;background:radial-gradient(ellipse at 50% -20%, rgba(201,162,76,.15), transparent 60%);}
+.overlay-hero .medallion{width:120px;height:120px;font-size:3rem;margin:0 auto 22px;}
+.overlay-hero h2{font-size:2.3rem;margin-bottom:10px;}
+.overlay-hero .field{color:var(--teal);}
+.overlay-hero .meta{color:var(--text-3);margin-top:10px;font-size:.88rem;}
+.overlay-body{padding:10px 50px 60px;}
+.ov-block{margin-bottom:52px;}
+.ov-block h3{font-size:1.25rem;margin-bottom:18px;display:flex;align-items:center;gap:10px;color:var(--gold-bright);}
+.ov-block h3 .ico{width:8px;height:8px;background:var(--gold);transform:rotate(45deg);}
+.ov-bio{color:var(--text-2);font-size:1rem;font-weight:300;}
+.ov-timeline{border-right:2px solid var(--line);padding-right:22px;display:flex;flex-direction:column;gap:22px;}
+.ov-timeline .tl-item{position:relative;}
+.ov-timeline .tl-item::before{content:"";position:absolute;right:-27px;top:6px;width:9px;height:9px;border-radius:50%;background:var(--teal);}
+.ov-timeline .yr{color:var(--gold);font-weight:700;font-size:.9rem;}
+.ov-timeline p{color:var(--text-2);font-size:.92rem;margin-top:4px;font-weight:300;}
+.ov-list{list-style:none;display:flex;flex-direction:column;gap:12px;}
+.ov-list li{color:var(--text-2);font-size:.94rem;font-weight:300;position:relative;padding-right:20px;}
+.ov-list li::before{content:"◆";position:absolute;right:0;top:2px;color:var(--teal);font-size:.6rem;}
+.ov-works{display:flex;flex-wrap:wrap;gap:10px;}
+.ov-works span{background:rgba(63,184,175,.1);border:1px solid rgba(63,184,175,.3);padding:8px 16px;border-radius:999px;font-size:.85rem;color:var(--teal);}
+.did-you-know{
+  background:linear-gradient(120deg,rgba(201,162,76,.1),rgba(63,184,175,.06));
+  border:1px solid var(--glass-brd);border-radius:16px;padding:26px 28px;font-size:.95rem;color:var(--parchment);font-weight:300;
+}
+.ov-sources{color:var(--text-3);font-size:.82rem;display:flex;flex-direction:column;gap:6px;}
+
+/* ===== gallery strip (illustrative) ===== */
+.ov-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.ov-gallery .gitem{
+  aspect-ratio:4/3;border-radius:14px;position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;border:1px solid var(--glass-brd);
+  background:var(--bg-panel-2);
+}
+.ov-gallery .gitem img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s var(--ease);}
+.ov-gallery .gitem:hover img{transform:scale(1.06);}
+
+footer{padding:70px 6vw 50px;text-align:center;color:var(--text-3);font-size:.85rem;border-top:1px solid var(--line);position:relative;z-index:2;}
+footer .brand{justify-content:center;margin-bottom:16px;color:var(--text-2);}
+
+@media(max-width:860px){
+  .nav-links,.nav-search{display:none;}
+  .burger{display:flex;cursor:pointer;}
+  nav.menu-open .nav-links{
+    display:flex;flex-direction:column;gap:0;position:fixed;top:64px;right:0;left:0;
+    background:rgba(7,9,17,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);
+    padding:10px 6vw 20px;z-index:99;
+  }
+  nav.menu-open .nav-links a{padding:14px 4px;border-bottom:1px solid rgba(255,255,255,.06);}
+  nav.menu-open .nav-search{
+    display:flex;position:fixed;top:calc(64px + 1px);left:0;right:0;margin:0;border-radius:0;
+    padding:14px 6vw;background:rgba(7,9,17,.97);border-bottom:1px solid var(--line);z-index:99;
+  }
+  nav.menu-open .nav-links{top:calc(64px + 52px);}
+  .burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+  .burger.open span:nth-child(2){opacity:0;}
+  .burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+  .burger span{transition:all .25s var(--ease);}
+  .eras::before{right:20px;}
+  .era{grid-template-columns:40px 1fr;}
+  .era-node{grid-column:1;}
+  .era:nth-child(odd) .era-card,.era:nth-child(even) .era-card{grid-column:2;text-align:left;}
+  .overlay-hero,.overlay-body{padding-left:24px;padding-right:24px;}
+  .ov-gallery{grid-template-columns:repeat(2,1fr);}
+}
+.reveal{opacity:0;transform:translateY(40px);}
+</style>
+</head>
+<body>
+
+<canvas id="stars-canvas"></canvas>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<nav id="main-nav">
+  <div class="brand">
+    <span class="mark">
+      <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="url(#g1)" stroke-width="1.2"/><path d="M20 4 L20 36 M4 20 L36 20" stroke="url(#g1)" stroke-width=".6"/><circle cx="20" cy="20" r="4" fill="none" stroke="url(#g1)" stroke-width="1"/><defs><linearGradient id="g1" x1="0" y1="0" x2="40" y2="40"><stop stop-color="#c9a24c"/><stop offset="1" stop-color="#3fb8af"/></linearGradient></defs></svg>
+    </span>
+    <span>تاريخ العلوم</span>
+  </div>
+  <div class="nav-links">
+    <a href="#hero" class="active">الرئيسية</a>
+    <a href="#timeline">الخط الزمني</a>
+    <a href="#scientists">العلماء</a>
+    <a href="#network">الشبكة العلمية</a>
+    <a href="#compare">المقارنة</a>
+    <a href="#map">الخريطة</a>
+    <a href="#quizzes">الاختبارات</a>
+  </div>
+  <div class="nav-search">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#a6acc7" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input id="global-search" type="text" placeholder="ابحث عن عالِم، تخصص، أو قرن…">
+  </div>
+  <div class="burger" id="burger-btn"><span></span><span></span><span></span></div>
+</nav>
+
+<header class="hero" id="hero">
+  <div class="hero-eyebrow"><span class="ln"></span> متحف رقمي تفاعلي <span class="ln"></span></div>
+  <h1>تاريخ العلوم</h1>
+  <p class="hero-sub">رحلة تفاعلية عبر أعظم علماء الحضارة الإسلامية والعربية، من بغداد وقرطبة إلى ستوكهولم وكاليفورنيا.</p>
+  <div class="hero-cta">
+    <a href="#timeline" class="btn-primary">ابدأ الرحلة</a>
+    <a href="#scientists" class="btn-ghost">تصفح العلماء</a>
+  </div>
+  <div class="scroll-cue"><span>مرِّر للأسفل</span><span class="dot"></span></div>
+</header>
+
+<main>
+
+<section id="timeline">
+  <div class="sec-head reveal">
+    <div class="sec-eyebrow"><span class="ln"></span>عبر الزمن<span class="ln"></span></div>
+    <h2 class="sec-title">ثلاثة <em>عصور</em> صنعت العلم</h2>
+    <p class="sec-desc">من إرث الحضارات القديمة، إلى ازدهار بيت الحكمة، وصولًا إلى رواد العلم المعاصرين.</p>
+  </div>
+  <div class="eras" id="eras-container"></div>
+</section>
+
+<div class="geo-divider"><span></span><span class="bar"></span><span></span><span class="bar"></span><span></span></div>
+
+<section id="scientists">
+  <div class="sec-head reveal">
+    <div class="sec-eyebrow"><span class="ln"></span>وجوه المعرفة<span class="ln"></span></div>
+    <h2 class="sec-title">ثلاثة عشر <em>عقلًا</em> غيّروا مسار العلم</h2>
+    <p class="sec-desc">انقر على أي بطاقة لتدخل تجربة تفاعلية كاملة عن حياة العالم وإنجازاته.</p>
+  </div>
+  <div class="filters reveal" id="filters"></div>
+  <div class="grid-scientists" id="scientists-grid"></div>
+</section>
+
+<div class="geo-divider"><span></span><span class="bar"></span><span></span><span class="bar"></span><span></span></div>
+
+<section id="network">
+  <div class="sec-head reveal">
+    <div class="sec-eyebrow"><span class="ln"></span>خيوط التأثير<span class="ln"></span></div>
+    <h2 class="sec-title">شبكة <em>العلاقات</em> العلمية</h2>
+    <p class="sec-desc">مرّر فوق أي عالم أو مجال لتكتشف خيوط التأثير التي امتدت عبر القرون. انقر لفتح صفحة العالم.</p>
+  </div>
+  <div class="network-wrap reveal">
+    <svg id="network-svg" viewBox="0 0 1100 600"></svg>
+    <div class="net-legend">
+      <span><i style="background:var(--gold)"></i> عالِم</span>
+      <span><i style="background:var(--teal)"></i> مجال / أثر معرفي</span>
+    </div>
+  </div>
+</section>
+
+<div class="geo-divider"><span></span><span class="bar"></span><span></span><span class="bar"></span><span></span></div>
+
+<section id="compare">
+  <div class="sec-head reveal">
+    <div class="sec-eyebrow"><span class="ln"></span>وجهًا لوجه<span class="ln"></span></div>
+    <h2 class="sec-title">قارن بين <em>عالِمين</em></h2>
+    <p class="sec-desc">اختر عالمين لاستكشاف الفروق والتشابهات في إنجازاتهما ومجالاتهما ومؤلفاتهما.</p>
+  </div>
+  <div class="compare-picker reveal">
+    <select id="compare-a"></select>
+    <select id="compare-b"></select>
+  </div>
+  <div id="compare-result"></div>
+</section>
+
+<div class="geo-divider"><span></span><span class="bar"></span><span></span><span class="bar"></span><span></span></div>
+
+<section id="map">
+  <div class="sec-head reveal">
+    <div class="sec-eyebrow"><span class="ln"></span>أثر جغرافي<span class="ln"></span></div>
+    <h2 class="sec-title">خريطة <em>المواليد</em></h2>
+    <p class="sec-desc">من البصرة إلى بخارى، ومن حلب إلى دمنهور — امتدت جغرافيا العلم عبر العالم الإسلامي وما بعده.</p>
+  </div>
+  <div class="map-wrap reveal">
+    <svg id="map-svg" viewBox="0 0 1000 480"></svg>
+    <div class="map-tooltip" id="map-tooltip"></div>
+  </div>
+</section>
+
+<div class="geo-divider"><span></span><span class="bar"></span><span></span><span class="bar"></span><span></span></div>
+
+<section id="quizzes">
+  <div class="sec-head reveal">
+    <div class="sec-eyebrow"><span class="ln"></span>اختبر معلوماتك<span class="ln"></span></div>
+    <h2 class="sec-title">اختبارات <em>تفاعلية</em></h2>
+    <p class="sec-desc">اختر اختبارًا مخصصًا لعالِم بعينه، أو خض الاختبار الشامل لكل العلماء. كل اختبار يعرض في النهاية نتيجتك، تحليل إجاباتك الصحيحة والخاطئة، وتقييم مستواك.</p>
+  </div>
+  <div class="grid-scientists" id="quiz-grid"></div>
+  <div id="quiz-stage"></div>
+</section>
+
+</main>
+
+<footer>
+  <div class="brand"><span class="mark"><svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="#c9a24c" stroke-width="1"/></svg></span> تاريخ العلوم</div>
+  <p>متحف رقمي تفاعلي — احتفاءً بإرث العلماء العرب والمسلمين وامتداده في العصر الحديث.</p>
+</footer>
+
+<div class="overlay" id="overlay">
+  <div class="overlay-panel" id="overlay-panel"></div>
+</div>
+
+<script>
+/* ============ DATA ============ */
+const FIELDS = {
+  math:{label:'الرياضيات',color:'#c9a24c'},
+  medicine:{label:'الطب',color:'#c96a4c'},
+  chemistry:{label:'الكيمياء',color:'#8fbf6c'},
+  physics:{label:'الفيزياء',color:'#3fb8af'},
+  astronomy:{label:'الفلك',color:'#7b8fd6'},
+  engineering:{label:'الهندسة',color:'#d68f4c'},
+  cs:{label:'علوم الحاسب',color:'#4cc9c0'},
+};
+
+const ERAS = [
+  {tag:'قبل الإسلام', title:'الحضارات القديمة', span:'حتى القرن السابع الميلادي',
+   desc:'إرث بابل ومصر واليونان في الرياضيات والفلك والطب، أساسٌ استند إليه علماء العصر الذهبي لاحقًا.'},
+  {tag:'٨م – ١٤م', title:'العصر الذهبي للحضارة الإسلامية', span:'بيت الحكمة، بغداد وقرطبة',
+   desc:'ازدهار غير مسبوق في الترجمة والابتكار، حيث تحوّلت المعرفة الموروثة إلى علوم تجريبية جديدة كليًا.'},
+  {tag:'القرن ١٩ – اليوم', title:'العصر الحديث', span:'من القاهرة إلى ستوكهولم',
+   desc:'امتداد الإرث العلمي العربي في رحاب العلم المعاصر، من الطب الجراحي إلى الكيمياء النووية وجوائز نوبل.'},
+];
+
+const SCIENTISTS = [
+{id:'ibn-alhaytham', name:'الحسن بن الهيثم', short:'ابن الهيثم', field:'physics', fieldLabel:'الفيزياء والبصريات',
+ era:1, century:'القرن ١٠–١١م', years:'٩٦٥م (٣٥٤هـ) – ١٠٤٠م (٤٣٠هـ)', birthplace:'البصرة، العراق', lat:30.5,lon:47.8,
+ fullName:'أبو علي الحسن بن الحسن بن الهيثم البصري',
+ images:['https://commons.wikimedia.org/wiki/Special:FilePath/Ibn_al-Haytham_crop.jpg'],
+ credit:'ويكيميديا كومنز',
+ bio:'عالم عربي مسلم يُعدّ أبا علم البصريات الحديث ومؤسسًا مبكرًا للمنهج العلمي التجريبي. عاش بين البصرة وبغداد ثم القاهرة، حيث أنجز أهم أعماله في عهد الفاطميين.',
+ timeline:[
+   {y:'٩٦٥م', t:'وُلد في مدينة البصرة، وتلقى تعليمه الأول فيها.'},
+   {y:'حوالي ١٠٠٠م', t:'انتقل إلى بغداد لمواصلة دراسته في العلوم والرياضيات.'},
+   {y:'حوالي ١٠١٠م', t:'استُدعي إلى مصر في عهد الحاكم بأمر الله لدراسة مشروع ضبط فيضان النيل.'},
+   {y:'١٠١١–١٠٢١م', t:'فترة اعتزال أُنجز خلالها أعظم أعماله، كتاب المناظر، في سبعة أجزاء.'},
+   {y:'١٠٤٠م', t:'توفي في القاهرة تاركًا إرثًا علميًا أثّر في أوروبا لقرون.'},
+ ],
+ achievements:[
+   'وضع أول تفسير علمي صحيح لآلية الإبصار، مبينًا أن الرؤية تحدث بدخول الضوء إلى العين لا بخروج شعاع منها.',
+   'صاغ منهجًا تجريبيًا قائمًا على الملاحظة والقياس والتحقق، سبق به المنهج العلمي الحديث بقرون.',
+   'درس انكسار الضوء وانعكاسه وقوس قزح والعدسات، ووضع أسس الكاميرا المظلمة (الغرفة المظلمة).',
+   'أسهم في الهندسة والفلك ونقد آراء بطليموس الفلكية.',
+ ],
+ works:['كتاب المناظر (سبعة أجزاء)','مقالة في ضوء القمر','رسالة في الكاميرا المظلمة'],
+ influence:'تُرجم كتاب المناظر إلى اللاتينية باسم Opticae Thesaurus وأثّر مباشرة في علماء أوروبا مثل روجر بيكون وكبلر ودافنشي، ويُعدّ حجر الأساس لعلم البصريات الحديث ومناهج البحث العلمي التجريبي.',
+ funFact:'تكريمًا له، أطلقت وكالة الفضاء الأوروبية اسمه على إحدى الفوهات القمرية، كما سُمي أحد الكويكبات باسمه، وهو تكريم نادر لعالم عاش قبل ألف عام.',
+ sources:['ابن أبي أصيبعة، عيون الأنباء في طبقات الأطباء','رشدي راشد، موسوعة تاريخ العلوم العربية','أحمد فؤاد باشا، تاريخ العلوم عند العرب','جورج سارتون، مقدمة في تاريخ العلوم','Encyclopaedia Britannica، مادة: Ibn al-Haytham']
+},
+{id:'ibn-sina', name:'ابن سينا', short:'ابن سينا', field:'medicine', fieldLabel:'الطب والفلسفة',
+ era:1, century:'القرن ١٠–١١م', years:'٩٨٠م (٣٧٠هـ) – ١٠٣٧م (٤٢٨هـ)', birthplace:'قرية أفشنة قرب بخارى (أوزبكستان حاليًا)', lat:39.77,lon:64.42,
+ fullName:'أبو علي الحسين بن عبد الله بن الحسن بن علي بن سينا',
+ images:['https://commons.wikimedia.org/wiki/Special:FilePath/IbnSina.jpg','https://commons.wikimedia.org/wiki/Special:FilePath/Avicenna_Portrait_on_Silver_Vase_-_Museum_at_BuAli_Sina_(Avicenna)_Mausoleum_-_Hamadan_-_Western_Iran_(7423560860).jpg','https://commons.wikimedia.org/wiki/Special:FilePath/Avicenne_-_Avicenna_-_Ibn_Sina_(980-1037)_CIPB1451.jpg'],
+ credit:'ويكيميديا كومنز',
+ bio:'طبيب وفيلسوف موسوعي، يُلقّب بـ«الشيخ الرئيس»، ألّف أشمل موسوعة طبية في العصور الوسطى وظلت مرجعًا في الجامعات الأوروبية لقرون.',
+ timeline:[
+   {y:'٩٨٠م', t:'وُلد قرب بخارى، وأظهر نبوغًا مبكرًا فحفظ القرآن وهو في العاشرة.'},
+   {y:'٩٩٧م', t:'عالج أمير بخارى نوح بن منصور فنال إذنًا بالاطلاع على مكتبته الملكية النادرة.'},
+   {y:'١٠١٢–١٠٢٤م', t:'تنقّل بين المدن الفارسية عالمًا ووزيرًا، وألّف كتابيه الكبيرين القانون والشفاء.'},
+   {y:'١٠٣٧م', t:'توفي في همذان، ودُفن فيها حيث لا يزال ضريحه قائمًا إلى اليوم.'},
+ ],
+ achievements:[
+   'ألّف «القانون في الطب»، الموسوعة التي بقيت المرجع الأول في كليات الطب الأوروبية حتى القرن السابع عشر.',
+   'وصف أمراضًا معدية وطرق انتقالها عبر الماء والتربة قبل اكتشاف الميكروبات بقرون.',
+   'أسهم في الصيدلة والتشريح والطب النفسي، وميّز بين أمراض القلب والأمراض العصبية.',
+   'كتب موسوعة فلسفية شاملة «الشفاء» جمعت المنطق والطبيعيات والإلهيات.',
+ ],
+ works:['القانون في الطب','الشفاء','النجاة','الإشارات والتنبيهات'],
+ influence:'عرفته أوروبا باسم Avicenna، وظل كتاب القانون يُدرَّس في مونبلييه وبادوفا حتى القرنين السادس عشر والسابع عشر، مما جعله من أكثر العقول تأثيرًا في تاريخ الطب العالمي.',
+ funFact:'يُقال إن ابن سينا أتقن الطب في السادسة عشرة من عمره، وكان يقضي الليل في القراءة والدراسة حتى يغلبه النعاس فيغتسل ليستعيد نشاطه ويعود لكتبه.',
+ sources:['ابن أبي أصيبعة، عيون الأنباء في طبقات الأطباء','القفطي، إخبار العلماء بأخبار الحكماء','رشدي راشد، موسوعة تاريخ العلوم العربية','أحمد فؤاد باشا، تاريخ العلوم عند العرب','Encyclopaedia Britannica، مادة: Avicenna (Ibn Sina)']
+},
+{id:'al-kindi', name:'الكندي', short:'الكندي', field:'physics', fieldLabel:'الفلسفة والعلوم',
+ era:1, century:'القرن ٩م', years:'حوالي ٨٠١م (١٨٥هـ) – ٨٧٣م (٢٥٩هـ)', birthplace:'الكوفة، العراق', lat:32.03,lon:44.4,
+ fullName:'أبو يوسف يعقوب بن إسحاق بن الصباح الكندي',
+ images:['https://commons.wikimedia.org/wiki/Special:FilePath/Al-Kindi_Portrait.jpg','https://commons.wikimedia.org/wiki/Special:FilePath/Al-Kindi_–_Cambridge,_Trinity_College_Library,_Medieval_manuscripts,_MS_R.15.17_(937),_secolo_XVII_–_BEIC_11521297.jpg'],
+ credit:'ويكيميديا كومنز',
+ bio:'يعقوب بن إسحاق الكندي، أول فيلسوف عربي مسلم، جمع بين الفلسفة والرياضيات والفلك والطب والموسيقى، وأشرف على حركة الترجمة في بيت الحكمة ببغداد.',
+ timeline:[
+   {y:'٨٠١م تقريبًا', t:'وُلد في الكوفة لأسرة عربية عريقة، وانتقل مبكرًا إلى البصرة ثم بغداد.'},
+   {y:'٨٣٠م تقريبًا', t:'عمل في بيت الحكمة أيام المأمون، وأشرف على ترجمة أعمال أرسطو وأفلاطون.'},
+   {y:'حوالي ٨٥٠م', t:'وضع كتابه في تحليل الشيفرة (فك رموز الرسائل المشفّرة) باستخدام تحليل التردد.'},
+   {y:'٨٧٣م', t:'توفي في بغداد تاركًا نحو مئتي رسالة في شتى العلوم.'},
+ ],
+ achievements:[
+   'يُعدّ أول من استخدم «تحليل التردد» لفكّ الشيفرات، وهو أساس علم التشفير الحديث.',
+   'مهّد لدمج الفلسفة اليونانية بالفكر الإسلامي، وأسس مدرسة فلسفية عربية مستقلة.',
+   'أسهم في علم الأدوية بحساب جرعات مركّبة رياضيًا، وفي الفلك والبصريات والموسيقى.',
+   'كتب في نظرية الأعداد والهندسة وعلم النفس الفلسفي.',
+ ],
+ works:['رسالة في استخراج المعمّى (فك الشيفرة)','كتاب الكندي إلى المعتصم في الفلسفة الأولى','رسائل في الطب والموسيقى'],
+ influence:'يُعتبر الكندي الأب الروحي لعلم التعمية (Cryptography) الحديث، ومؤسس مدرسة الفلسفة العربية التي مهّدت الطريق أمام الفارابي وابن سينا وابن رشد.',
+ funFact:'مخطوطة الكندي في «تحليل الشيفرة» ظلت مجهولة في أرشيف إسطنبول حتى اكتُشفت في القرن العشرين، لتكشف أنه سبق أوروبا في علم التشفير بنحو ثمانية قرون.',
+ sources:['ابن النديم، الفهرست','القفطي، إخبار العلماء بأخبار الحكماء','جورج سارتون، مقدمة في تاريخ العلوم','رشدي راشد، موسوعة تاريخ العلوم العربية','Encyclopaedia Britannica، مادة: Al-Kindi']
+},
+{id:'al-razi', name:'أبو بكر الرازي', short:'الرازي', field:'medicine', fieldLabel:'الطب والكيمياء',
+ era:1, century:'القرن ٩–١٠م', years:'٨٦٥م (٢٥١هـ) – ٩٢٥م (٣١٣هـ)', birthplace:'الري (قرب طهران حاليًا)', lat:35.6,lon:51.4,
+ fullName:'أبو بكر محمد بن زكريا الرازي',
+ images:['https://commons.wikimedia.org/wiki/Special:FilePath/Portrait_of_Rhazes_(al-Razi)_(AD_865_-_925)_Wellcome_L0005053_(cropped).jpg','https://commons.wikimedia.org/wiki/Special:FilePath/Al_Razi_Receuil_de_traite_de_medecine_translated_by_Gerard_de_Cremone_Second_half_of_13th_century.jpg'],
+ credit:'Wellcome Collection عبر ويكيميديا كومنز',
+ bio:'محمد بن زكريا الرازي، من أعظم أطباء العصور الوسطى، جمع بين الطب السريري والكيمياء التجريبية، وأول من فرّق طبيًا بين الجدري والحصبة.',
+ timeline:[
+   {y:'٨٦٥م', t:'وُلد في مدينة الري، واهتم في شبابه بالموسيقى قبل أن يتجه للطب والكيمياء.'},
+   {y:'حوالي ٨٩٠م', t:'ترأس البيمارستان (المستشفى) في الري، ثم انتقل لإدارة مستشفى بغداد الكبير.'},
+   {y:'حوالي ٩١٠م', t:'ألّف موسوعته الطبية الضخمة «الحاوي» جامعًا فيها خبرته السريرية.'},
+   {y:'٩٢٥م', t:'توفي في الري بعد إصابته بالعمى في أواخر حياته.'},
+ ],
+ achievements:[
+   'أول من ميّز إكلينيكيًا بين مرضي الجدري والحصبة ووصف أعراضهما بدقة في رسالة مستقلة.',
+   'أدخل مفهوم التجربة السريرية المقارنة، إذ قارن بين مجموعتين من المرضى لاختبار فعالية العلاج.',
+   'أسهم في الكيمياء العملية، ووصف أجهزة معملية ومركّبات كيميائية كالكحول وحمض الكبريتيك.',
+   'رفض التسليم الأعمى بآراء القدماء ودعا إلى مراجعتها بالتجربة والملاحظة.',
+ ],
+ works:['الحاوي في الطب','المنصوري في الطب','الجدري والحصبة','الأسرار (في الكيمياء)','الطب الروحاني','من لا يحضره الطبيب'],
+ influence:'تُرجمت مؤلفاته إلى اللاتينية والأوروبية ودُرّست في الجامعات الأوروبية حتى عصر النهضة، وتُعدّ رسالته عن الجدري والحصبة من أوائل النصوص الطبية القائمة على التمييز التفريقي بين الأمراض.',
+ funFact:'يُروى أن الرازي اختار موقع مستشفى بغداد بطريقة علمية: علّق قطعًا من اللحم في أحياء مختلفة من المدينة، واختار الموقع الذي تأخّر فيه فساد اللحم باعتباره الأنسب من حيث جودة الهواء.',
+ sources:['ابن أبي أصيبعة، عيون الأنباء في طبقات الأطباء','القفطي، إخبار العلماء بأخبار الحكماء','أحمد فؤاد باشا، تاريخ العلوم عند العرب','رشدي راشد، موسوعة تاريخ العلوم العربية','Encyclopaedia Britannica، مادة: Al-Razi (Rhazes)']
+},
+{id:'al-khwarizmi', name:'الخوارزمي', short:'الخوارزمي', field:'math', fieldLabel:'الرياضيات والفلك',
+ era:1, century:'القرن ٨–٩م', years:'حوالي ٧٨٠م (١٦٤هـ) – ٨٥٠م (٢٣٥هـ)', birthplace:'إقليم خوارزم (أوزبكستان حاليًا)', lat:41.38,lon:60.63,
+ fullName:'أبو عبد الله محمد بن موسى الخوارزمي',
+ images:['https://commons.wikimedia.org/wiki/Special:FilePath/Al-Khwarizmi_portrait.jpg'],
+ credit:'ويكيميديا كومنز',
+ bio:'محمد بن موسى الخوارزمي، عالم رياضيات وفلك عمل في بيت الحكمة ببغداد، ويُعدّ واضع علم الجبر ومصدر إلهام كلمتي «الجبر» و«الخوارزمية» في اللغات الحديثة.',
+ timeline:[
+   {y:'٧٨٠م تقريبًا', t:'وُلد على الأرجح في إقليم خوارزم، ونشأ في بغداد في عصر ازدهار العلوم.'},
+   {y:'٨١٣–٨٣٣م', t:'عمل عالمًا رياضيًا وفلكيًا في بيت الحكمة في عهدي المأمون والمعتصم.'},
+   {y:'٨٢٠م تقريبًا', t:'ألّف كتابه الشهير «الجبر والمقابلة» الذي أسس علم الجبر كفرع مستقل.'},
+   {y:'٨٥٠م تقريبًا', t:'توفي في بغداد بعد أن وضع أيضًا جداول فلكية وخرائط جغرافية دقيقة.'},
+ ],
+ achievements:[
+   'أسس علم الجبر بوصفه فرعًا رياضيًا مستقلًا له قواعد ومنهج منظّم لحل المعادلات.',
+   'قدّم للعالم النظام العددي الهندي (الأرقام العربية) في أوروبا عبر ترجمة أعماله.',
+   'وضع منهجًا خطوة بخطوة لحل المشكلات، أصبح لاحقًا أساس كلمة «Algorithm» في الحاسوب.',
+   'أنجز أعمالًا مهمة في الفلك والجغرافيا، منها جداول فلكية وخرائط لمعالم الأرض.',
+ ],
+ works:['الكتاب المختصر في حساب الجبر والمقابلة','كتاب الجمع والتفريق بحساب الهند','زيج السند هند (في الفلك)','صورة الأرض (في الجغرافيا)','كتاب العمل بالإسطرلاب'],
+ influence:'اسمه اللاتيني «Algoritmi» أصبح جذر كلمة Algorithm، وهو حجر الأساس لعلوم الحاسب الحديثة، بينما لا تزال كلمة Algebra مشتقة مباشرة من عنوان كتابه، وقد نشر أيضًا النظام العددي الهندي واستخدام الصفر في أوروبا.',
+ funFact:'كل خوارزمية تعمل اليوم داخل هاتفك أو حاسوبك تحمل بشكل غير مباشر اسم عالم بغدادي عاش قبل أكثر من ألف ومئتي عام.',
+ sources:['ابن النديم، الفهرست','القفطي، إخبار العلماء بأخبار الحكماء','جورج سارتون، مقدمة في تاريخ العلوم','رشدي راشد، موسوعة تاريخ العلوم العربية','Encyclopaedia Britannica، مادة: Al-Khwarizmi']
+},
+{id:'al-jazari', name:'بديع الزمان الجزري', short:'الجزري', field:'engineering', fieldLabel:'الهندسة الميكانيكية',
+ era:1, century:'القرن ١٢–١٣م', years:'١١٣٦م (٥٣١هـ) – ١٢٠٦م (٦٠٢هـ)', birthplace:'مدينة الجزيرة (جزيرة ابن عمر، جنوب شرق تركيا حاليًا)', lat:37.91,lon:40.24,
+ fullName:'بديع الزمان أبو العز إسماعيل بن الرزاز الجزري',
+ images:['https://commons.wikimedia.org/wiki/Special:FilePath/Al-jazari_elephant_clock.png','https://commons.wikimedia.org/wiki/Special:FilePath/Al-Jazari%27s_candle_clock_with_scribe_and_pulley_system.jpg','https://commons.wikimedia.org/wiki/Special:FilePath/Elephant_clock_in_Mardin,_Turkey.JPG'],
+ credit:'رسم من مخطوطة الجزري، ١٢٠٦م — ويكيميديا كومنز',
+ bio:'إسماعيل بن الرزاز الجزري، مهندس ومخترع عمل كبير المهندسين في بلاط بني أرتق بديار بكر، ويُعدّ أبا الروبوتات والهندسة الميكانيكية التطبيقية.',
+ timeline:[
+   {y:'١١٣٦م', t:'وُلد في منطقة الجزيرة، وتبع مهنة أبيه في الهندسة الميكانيكية.'},
+   {y:'حوالي ١١٨١م', t:'عمل كبيرًا للمهندسين في بلاط الأمراء الأرتقيين بآمد (ديار بكر).'},
+   {y:'١٢٠٦م', t:'أتمّ كتابه الموسوعي «الجامع بين العلم والعمل النافع في صناعة الحيل» بتكليف من الأمير.'},
+ ],
+ achievements:[
+   'صمّم ساعات مائية وفلكية معقدة، من أشهرها «ساعة الفيل» ذات الآليات المتعددة المتزامنة.',
+   'ابتكر آلات ذاتية الحركة (أوتوماتا) من بينها روبوتات موسيقية تُعدّ من أقدم الآلات القابلة للبرمجة في التاريخ.',
+   'استخدم عمود المرفق (Crankshaft) لتحويل الحركة الدائرية إلى حركة ترددية، وهو ابتكار كان له أثر كبير في تطور المحركات الحديثة قبل الثورة الصناعية بقرون.',
+   'صمّم مضخات مياه بالكرنك والمرفق، وهي مبادئ لا تزال أساسًا في الهندسة الميكانيكية الحديثة.',
+   'وثّق أكثر من خمسين اختراعًا برسومات هندسية دقيقة تصلح للتصنيع، بأسلوب سبق عصره بقرون.',
+ ],
+ works:['الجامع بين العلم والعمل النافع في صناعة الحيل'],
+ influence:'يعتبره مؤرخو التقنية أحد آباء الروبوتات والهندسة الآلية؛ فآلياته في التروس والصمامات ذاتية التحكم أثّرت في تطور الساعات والآلات الأوروبية لاحقًا.',
+ funFact:'صمّم الجزري «آلة الوضوء» الأوتوماتيكية التي تسكب الماء وتقدّم المنشفة تلقائيًا — نموذج أولي لفكرة الأجهزة الذكية بعد ثمانية قرون من اختراعها.',
+ sources:['بديع الزمان الجزري، الجامع بين العلم والعمل النافع في صناعة الحيل','دونالد هيل، Studies in Medieval Islamic Technology','أحمد فؤاد باشا، تاريخ العلوم عند العرب','رشدي راشد، موسوعة تاريخ العلوم العربية','Encyclopaedia Britannica، مادة: Al-Jazari']
+},
+{id:'mariam-alijliya', name:'مريم الإسطرلابية', short:'مريم الإسطرلابية', field:'astronomy', fieldLabel:'صناعة الآلات الفلكية',
+ era:1, century:'القرن ١٠م', years:'أوائل القرن العاشر الميلادي (تاريخ الوفاة غير مؤكد)', birthplace:'حلب، سوريا', lat:36.2,lon:37.16,
+ fullName:'مريم بنت كوشيار (مريم العجلية)، اشتهرت باسم مريم الإسطرلابية',
+ images:['https://commons.wikimedia.org/wiki/Special:FilePath/Persian_astrolabe.jpg','https://commons.wikimedia.org/wiki/Special:FilePath/Britannica_Astrolabe_-_Persian_Astrolabe_c.1712.jpg'],
+ credit:'أسطرلاب إسلامي تقليدي (توضيحي) — ويكيميديا كومنز',
+ bio:'مريم بنت كوشيار، المعروفة بمريم الإسطرلابية أو مريم العجلية، صانعة أسطرلابات عملت في بلاط سيف الدولة الحمداني بحلب، ومن أوائل النساء المعروفات تاريخيًا في صناعة الآلات الفلكية الدقيقة.',
+ timeline:[
+   {y:'القرن العاشر', t:'نشأت في حلب في أسرة تعمل في صناعة الآلات العلمية، وكان والدها من صنّاع الإسطرلاب المهرة.'},
+   {y:'تلمذتها', t:'تتلمذت على يد العالم الشهير المعروف في المصادر باسم الأستاذ بطلمس (بطلمس الإسطرلابي)، فاكتسبت خبرة كبيرة في تصميم الأسطرلابات الدقيقة.'},
+   {y:'عهد سيف الدولة', t:'عملت في بلاط الأمير الحمداني سيف الدولة بحلب، الراعي الشهير للعلم والأدب.'},
+   {y:'أواخر القرن العاشر', t:'اشتهرت بدقة صناعتها للأسطرلابات عالية الدقة التي استخدمها علماء الفلك والملاحون والجغرافيون.'},
+ ],
+ achievements:[
+   'أتقنت تصميم وصناعة الأسطرلاب، الآلة الفلكية الأدق في عصرها لتحديد مواقع النجوم وأوقات الصلاة والقبلة وخطوط العرض.',
+   'مثّلت استثناءً نادرًا موثّقًا لحضور المرأة في الحرف العلمية الدقيقة بالعصر الذهبي.',
+   'دربت عددًا من الحرفيين على صناعة الأدوات الفلكية، وأسهمت في نشر استخدام الإسطرلاب.',
+   'أبدعت في نقش التدريجات والزوايا بدقة عالية على الأجزاء المعدنية للإسطرلاب.',
+ ],
+ works:['أسطرلابات مصنوعة بيدها (لم يبق منها نماذج موثقة إلى اليوم)'],
+ influence:'يذكرها المؤرخ ابن النديم في «الفهرست»، وتُستشهد بها اليوم كرمز لحضور المرأة في العلوم الدقيقة بالحضارة الإسلامية، ملهمةً أجيالًا من الباحثات في تاريخ العلم.',
+ funFact:'الأسطرلاب الذي صنعته أمثال مريم لم يكن مجرد أداة فلكية، بل أشبه بحاسوب تناظري مبكر يحل عشرات المسائل الفلكية والزمنية بحركة قرص واحد.',
+ sources:['ابن النديم، الفهرست','جورج سارتون، مقدمة في تاريخ العلوم','رشدي راشد، موسوعة تاريخ العلوم العربية','أحمد فؤاد باشا، تاريخ العلوم عند العرب','Encyclopaedia of Islam، مادة: Al-Ijliya']
+},
+{id:'mostafa-elsayed', name:'مصطفى السيد', short:'مصطفى السيد', field:'chemistry', fieldLabel:'كيمياء النانو',
+ era:2, century:'معاصر (وُلد ١٩٣٣)', years:'وُلد ٨ مايو ١٩٣٣م', birthplace:'مدينة زفتى، محافظة الغربية، مصر', lat:30.72,lon:31.24,
+ fullName:'الدكتور مصطفى كمال السيد',
+ images:['https://commons.wikimedia.org/wiki/Special:FilePath/Mostapha_with_2_students_(cropped).JPG'],
+ credit:'ويكيميديا كومنز',
+ bio:'كيميائي مصري أمريكي، أستاذ بمعهد جورجيا للتكنولوجيا، ويُعدّ من أبرز رواد «كيمياء النانو» وخاصة دراسة الخواص البصرية لجسيمات الذهب النانوية.',
+ timeline:[
+   {y:'١٩٣٣م', t:'وُلد في مدينة زفتى بمحافظة الغربية.'},
+   {y:'١٩٥٣م', t:'حصل على بكالوريوس العلوم (الكيمياء) من جامعة عين شمس.'},
+   {y:'١٩٥٨م', t:'نال درجة الدكتوراه في الكيمياء من جامعة ولاية فلوريدا في الولايات المتحدة.'},
+   {y:'منذ التسعينيات', t:'قاد أبحاثًا رائدة في «البلازمونيات النانوية» وتطبيقاتها الطبية والتقنية في معهد جورجيا للتكنولوجيا.'},
+   {y:'حتى اليوم', t:'يواصل بحثه ويشرف على أجيال من الباحثين، وقد نشر أكثر من ٧٠٠ بحث علمي.'},
+ ],
+ achievements:[
+   'من رواد ميدان «البلازمونيات» التي تدرس تفاعل الضوء مع جسيمات الذهب والفضة النانوية.',
+   'طوّر استخدام جسيمات الذهب النانوية في تشخيص وعلاج مرض السرطان باستهداف الخلايا المصابة بدقة.',
+   'نال قلادة النيل العظمى (أعلى وسام مدني في مصر) وجائزة الملك فيصل العالمية في العلوم.',
+   'عضو الأكاديمية الوطنية الأمريكية للعلوم، وأشرف على عشرات الباحثين وطلاب الدراسات العليا.',
+ ],
+ works:['أكثر من ٧٠٠ بحث علمي محكّم في الكيمياء الفيزيائية وتقنية النانو وعلاج السرطان'],
+ influence:'أسهمت أبحاثه في تأسيس حقل تطبيقي كامل يربط بين كيمياء النانو والطب الحديث، ويُعتبر من أكثر العلماء العرب استشهادًا بأبحاثهم عالميًا في مجال الكيمياء.',
+ funFact:'اكتشف فريقه أن جسيمات الذهب النانوية يمكن أن «تُبصر» الخلايا السرطانية وتلتصق بها بدقة، لتُستخدم لاحقًا كوسيلة تشخيص وعلاج بالحرارة الضوئية الموجهة.',
+ sources:['السيرة الذاتية للدكتور مصطفى السيد','جامعة عين شمس','معهد جورجيا للتكنولوجيا (Georgia Institute of Technology)','أحمد فؤاد باشا، تاريخ العلوم عند العرب','Encyclopaedia Britannica، مادة: Mostafa A. El-Sayed']
+},
+{id:'ahmed-zewail', name:'أحمد زويل', short:'أحمد زويل', field:'chemistry', fieldLabel:'كيمياء الفيمتوثانية',
+ era:2, century:'١٩٤٦م – ٢٠١٦م', years:'٢٦ فبراير ١٩٤٦م – ٢ أغسطس ٢٠١٦م', birthplace:'مدينة دمنهور، محافظة البحيرة، مصر', lat:31.04,lon:30.47,
+ fullName:'أحمد حسن زويل',
+ images:['https://commons.wikimedia.org/wiki/Special:FilePath/Ahmed_Zewail_HD2009_Othmer_Gold_Medal_portrait.JPG'],
+ credit:'ويكيميديا كومنز',
+ bio:'كيميائي مصري أمريكي، حائز جائزة نوبل في الكيمياء عام ١٩٩٩، ومؤسس علم «كيمياء الفيمتوثانية» الذي يرصد حركة الذرات أثناء التفاعلات الكيميائية.',
+ timeline:[
+   {y:'١٩٤٦م', t:'وُلد في دمنهور، وانتقل في طفولته إلى دسوق بمحافظة كفر الشيخ حيث تلقى تعليمه الأساسي.'},
+   {y:'١٩٦٧م', t:'حصل على بكالوريوس العلوم في الكيمياء من جامعة الإسكندرية بتقدير امتياز مع مرتبة الشرف.'},
+   {y:'١٩٧٤م', t:'نال درجة الدكتوراه في الكيمياء من جامعة بنسلفانيا، ثم التحق بمعهد كاليفورنيا للتكنولوجيا (Caltech).'},
+   {y:'الثمانينيات', t:'طوّر في معهد كالتك تقنية تصوير بالليزر الفائق السرعة لرصد التفاعلات الكيميائية لحظة بلحظة.'},
+   {y:'١٩٩٩م', t:'حصل على جائزة نوبل في الكيمياء، أول عالم مصري وعربي يفوز بها في مجال العلوم.'},
+   {y:'٢٠١٦م', t:'توفي في باسادينا بكاليفورنيا، بعد مسيرة علمية أسهمت في تأسيس مدينة زويل للعلوم والتكنولوجيا في مصر.'},
+ ],
+ achievements:[
+   'ابتكر تقنية تصوير بالليزر تعمل بوحدة الفيمتوثانية (جزء من مليون بليون من الثانية) لرصد حركة الذرات أثناء التفاعل الكيميائي.',
+   'أول عربي وعالم إسلامي ينال جائزة نوبل في الكيمياء.',
+   'أسّس علمًا جديدًا بالكامل عُرف باسم «الكيمياء الفائقة السرعة» أو Femtochemistry.',
+   'أسهم في تأسيس مدينة زويل للعلوم والتكنولوجيا في مصر لدعم البحث العلمي العربي.',
+ ],
+ works:['رحلة عبر الزمن','عصر العلم','حوار الحضارات','أكثر من ٦٠٠ بحث علمي محكّم'],
+ influence:'فتحت اكتشافاته البصيرة على «الفيديو الجزيئي» للتفاعلات الكيميائية، وألهمت أجيالًا من العلماء العرب، وأسّس مدينة زويل للعلوم والتكنولوجيا والابتكار في مصر لدعم البحث العلمي والتعليم المتقدم.',
+ funFact:'بفضل تقنيته، أصبح ممكنًا «تصوير» لحظة انكسار وتكوّن الروابط الكيميائية بين الذرات — أشبه بتصوير فيلم سينمائي لأسرع حدث في الطبيعة، بوحدة زمن تُقاس بالفيمتوثانية (جزء من مليون بليون من الثانية).',
+ sources:['أحمد زويل، رحلة عبر الزمن','أحمد زويل، عصر العلم','مؤسسة نوبل، بيانات جائزة نوبل في الكيمياء ١٩٩٩','جامعة الإسكندرية','معهد كاليفورنيا للتكنولوجيا (Caltech)']
+},
+{id:'magdi-yacoub', name:'مجدي يعقوب', short:'مجدي يعقوب', field:'medicine', fieldLabel:'جراحة القلب',
+ era:2, century:'معاصر (وُلد ١٩٣٥)', years:'وُلد ١٦ نوفمبر ١٩٣٥م', birthplace:'مدينة بلبيس، محافظة الشرقية، مصر', lat:30.58,lon:31.56,
+ fullName:'السير مجدي حبيب يعقوب',
+ images:['https://commons.wikimedia.org/wiki/Special:FilePath/Magdi_Yacoub_(cropped).JPG'],
+ credit:'ويكيميديا كومنز',
+ bio:'جراح قلب مصري بريطاني، أستاذ بجامعة إمبريال كوليدج لندن، ومن أبرز رواد جراحة وزراعة القلب في العالم، وأجرى آلاف العمليات المنقذة للحياة.',
+ timeline:[
+   {y:'١٩٣٥م', t:'وُلد في بلبيس بمصر، وتأثر مبكرًا بمهنة الطب لأن والده كان طبيبًا.'},
+   {y:'١٩٥٧م', t:'حصل على بكالوريوس الطب والجراحة من جامعة القاهرة.'},
+   {y:'بعد ١٩٥٧م', t:'سافر إلى المملكة المتحدة لاستكمال تدريبه وتخصصه في جراحة القلب والصدر.'},
+   {y:'١٩٨٠م', t:'أسّس مركز زراعة القلب في مستشفى هارفيلد بالمملكة المتحدة.'},
+   {y:'٢٠٠٨م', t:'شارك في تأسيس مؤسسة مجدي يعقوب للقلب، التي أطلقت مشروع أسوان للقلب.'},
+   {y:'حتى اليوم', t:'يواصل دعم مركز مجدي يعقوب العالمي للقلب بأسوان، ويشرف على أبحاث الخلايا الجذعية في علاج أمراض القلب.'},
+ ],
+ achievements:[
+   'أجرى آلاف عمليات القلب المفتوح الناجحة خلال مسيرته المهنية.',
+   'من رواد تطوير تقنيات زراعة القلب وزراعة القلب والرئتين في العالم.',
+   'أسّس مركز مجدي يعقوب العالمي للقلب بأسوان لعلاج المرضى وتدريب الأطباء وإجراء الأبحاث.',
+   'حصل على لقب «سير» من ملكة المملكة المتحدة، وقالدة النيل العظمى من مصر، وجائزة الملك فيصل العالمية في الطب.',
+ ],
+ works:['أبحاث محكّمة في جراحة وزراعة القلب وهندسة الأنسجة القلبية'],
+ influence:'يُعدّ من أكثر جراحي القلب تأثيرًا في العالم، ومنح لقب «السير» في بريطانيا تقديرًا لإسهاماته، بينما تواصل مؤسسته الخيرية تدريب جراحين جدد في العالم النامي وعلاج المرضى مجانًا أو بتكلفة رمزية.',
+ funFact:'أسّس مجدي يعقوب مركزًا عالميًا لجراحة القلب في أسوان يقدّم جراحات مجانية للأطفال، ويسافر إليه دوريًا رغم تقدّمه في العمر لإجراء عمليات ميدانية بنفسه.',
+ sources:['مؤسسة مجدي يعقوب للقلب','جامعة القاهرة، كلية الطب','مستشفى هارفيلد (Harefield Hospital)','أحمد فؤاد باشا، تاريخ العلوم عند العرب','Encyclopaedia Britannica، مادة: Magdi Yacoub']
+},
+{id:'shadia-habbal', name:'شادية الرفاعي حبال', short:'شادية حبال', field:'astronomy', fieldLabel:'فيزياء الشمس',
+ era:2, century:'معاصرة (وُلدت ١٩٤٨)', years:'وُلدت ١٩٤٨م', birthplace:'مدينة حمص، سوريا', lat:34.73,lon:36.72,
+ fullName:'الدكتورة شادية الرفاعي حبّال',
+ images:['https://commons.wikimedia.org/wiki/Special:FilePath/2024_Total_Solar_Eclipse_Corona.jpg','https://commons.wikimedia.org/wiki/Special:FilePath/Corona_detail_from_the_2012_total_solar_eclipse_(8215152495).jpg'],
+ credit:'صورة توضيحية للهالة الشمسية أثناء الكسوف الكلي — ويكيميديا كومنز',
+ bio:'شادية الرفاعي حبال، عالمة فيزياء شمسية سورية أمريكية، أستاذة بمعهد الفلك في جامعة هاواي، ومن أبرز الباحثات في دراسة الهالة الشمسية عبر رحلات مطاردة كسوف الشمس حول العالم.',
+ timeline:[
+   {y:'دراسة مبكرة', t:'حصلت على بكالوريوس الفيزياء والرياضيات من جامعة دمشق، ثم ماجستير الفيزياء من الجامعة الأمريكية في بيروت.'},
+   {y:'الدكتوراه', t:'نالت درجة الدكتوراه في الفيزياء من جامعة سينسيناتي الأمريكية.'},
+   {y:'١٩٧٨م', t:'انضمت إلى مركز هارفارد-سميثسونيان للفيزياء الفلكية، حيث أسست مجموعة بحثية في الفيزياء الشمسية الأرضية.'},
+   {y:'منذ ١٩٩٥م', t:'قادت أكثر من عشر بعثات علمية دولية لرصد كسوف الشمس الكلي حول العالم.'},
+   {y:'٢٠٠٢م فما بعد', t:'أصبحت أستاذة في معهد الفلك بجامعة هاواي، وتواصل قيادة أبحاث الهالة الشمسية.'},
+ ],
+ achievements:[
+   'من الرواد في دراسة الهالة الشمسية (الغلاف الخارجي للشمس) وتفسير سلوك الرياح الشمسية.',
+   'طوّرت وقادت بعثات علمية ميدانية لرصد كسوف الشمس الكلي من مواقع صعبة حول العالم لجمع بيانات نادرة.',
+   'أسهمت في فهم كيفية تسخين الهالة الشمسية إلى درجات حرارة تفوق سطح الشمس نفسه، وهو لغز فيزيائي طويل الأمد.',
+   'نشطة في تشجيع النساء والعرب على خوض مجالات فيزياء الفلك.',
+ ],
+ works:['عشرات الأبحاث المحكّمة في فيزياء الهالة الشمسية والرياح الشمسية والطقس الفضائي'],
+ influence:'تسهم أبحاثها في فهم الطقس الفضائي الذي يؤثر على الأقمار الصناعية وشبكات الاتصالات على الأرض، وتُعدّ نموذجًا ملهمًا للعالمات العربيات في ميدان الفيزياء الفلكية.',
+ funFact:'لرصد الهالة الشمسية بدقة، سافرت في بعثات علمية إلى مواقع نائية حول العالم — من الهند والصين إلى غوادلوب وبولينيزيا الفرنسية — لتكون في مسار كسوف الشمس الكلي لدقائق معدودة فقط.',
+ sources:['مجلة المرأة العربية في العلوم والتكنولوجيا، مكتبة الإسكندرية','معهد الفلك، جامعة هاواي','تقرير الجزيرة: شادية حبّال، سيدة الشمس']
+},
+{id:'samira-moussa', name:'سميرة موسى', short:'سميرة موسى', field:'physics', fieldLabel:'الفيزياء الذرية',
+ era:2, century:'١٩١٧م – ١٩٥٢م', years:'٣ مارس ١٩١٧م – ٥ أغسطس ١٩٥٢م', birthplace:'قرية سنبو الكبرى، مركز زفتى، محافظة الغربية، مصر', lat:30.87,lon:31.03,
+ fullName:'الدكتورة سميرة موسى علي',
+ images:['https://commons.wikimedia.org/wiki/Special:FilePath/SameeraMoussa.jpg'],
+ credit:'ويكيميديا كومنز',
+ bio:'عالمة ذرية مصرية، أول امرأة تحصل على درجة الدكتوراه في الفيزياء الذرية بمصر، ولُقّبت بـ«مدام كوري الشرق» لدعوتها إلى استخدام الطاقة الذرية في أغراض سلمية.',
+ timeline:[
+   {y:'١٩١٧م', t:'وُلدت في قرية سنبو الكبرى بمحافظة الغربية، وأظهرت تفوقًا دراسيًا ملحوظًا منذ صغرها.'},
+   {y:'١٩٣٩م', t:'تخرجت في قسم الفيزياء بجامعة فؤاد الأول (جامعة القاهرة حاليًا) وكانت الأولى على دفعتها.'},
+   {y:'بعدها مباشرة', t:'عُيّنت أول معيدة بكلية العلوم في الجامعة، وحصلت على الماجستير في التوصيل الحراري للغازات.'},
+   {y:'لاحقًا', t:'سافرت إلى بريطانيا ونالت درجة الدكتوراه في الأشعة السينية وتأثيرها في المواد المختلفة.'},
+   {y:'١٩٥٢م', t:'توفيت في حادث سيارة في الولايات المتحدة أثناء زيارة علمية، وأثيرت حول ملابساته فرضيات لم تثبت رسميًا بأدلة قاطعة.'},
+ ],
+ achievements:[
+   'أول امرأة مصرية وعربية تحصل على الدكتوراه في الفيزياء الذرية.',
+   'دعت إلى جعل تكلفة العلاج بالطاقة الذرية «رخيصة كالأسبرين» متاحة لعموم المرضى الفقراء.',
+   'نظّمت مؤتمر «الذرة من أجل السلام» ودعت لاستخدام الطاقة النووية في أغراض طبية وعلمية سلمية.',
+   'مثّلت رمزًا مبكرًا لحضور المرأة العربية في العلوم الفيزيائية المتقدمة منتصف القرن العشرين.',
+ ],
+ works:['أبحاث في الفيزياء الذرية وتطبيقاتها الطبية السلمية'],
+ influence:'رغم قصر مسيرتها، تحوّلت سميرة موسى إلى رمز ملهم لأجيال من العالمات العربيات، ولا تزال قصتها تُروى تكريمًا لسعيها نحو علم يخدم الإنسانية سلميًا.',
+ funFact:'اشتهرت بمقولتها إنها تحلم بيوم يصبح فيه العلاج بالطاقة الذرية متاحًا لكل مريض فقير «بسعر الأسبرين»، رؤية سبقت عصرها في ربط العلم بالعدالة الاجتماعية.',
+ sources:['الهيئة العامة للاستعلامات المصرية، سميرة موسى','موسوعة الجزيرة: سميرة موسى.. أول عالمة ذرة عربية','أرشيف جامعة القاهرة']
+},
+{id:'nikola-tesla', name:'نيكولا تسلا', short:'تسلا', field:'engineering', fieldLabel:'الهندسة الكهربائية',
+ era:2, century:'١٨٥٦م – ١٩٤٣م', years:'١٠ يوليو ١٨٥٦م – ٧ يناير ١٩٤٣م', birthplace:'قرية سميلجان (ضمن الإمبراطورية النمساوية آنذاك، كرواتيا حاليًا)', lat:44.5,lon:15.4,
+ fullName:'نيكولا تسلا (Nikola Tesla)',
+ images:['https://commons.wikimedia.org/wiki/Special:FilePath/N.Tesla.JPG','https://commons.wikimedia.org/wiki/Special:FilePath/Nikola_Tesla,_with_his_equipment_Wellcome_M0014782_-_restoration2.jpg','https://commons.wikimedia.org/wiki/Special:FilePath/Tesla_coil_(discharge)..JPG'],
+ credit:'ويكيميديا كومنز',
+ bio:'مخترع ومهندس كهربائي صربي أمريكي، من أبرز رواد الثورة الكهربائية الحديثة، اشتهر بتطوير نظام التيار المتردد (AC) الذي أصبح أساس نقل الكهرباء وتوزيعها في العالم كله.',
+ timeline:[
+   {y:'١٨٥٦م', t:'وُلد في قرية سميلجان لأسرة صربية؛ كان والده رجل دين وكانت والدته موهوبة في صناعة الأدوات المنزلية.'},
+   {y:'دراسته', t:'درس الهندسة الكهربائية في الجامعة التقنية بغراتس بالنمسا، وواصل بجامعة براغ دون إكمال رسمي.'},
+   {y:'١٨٨٤م', t:'هاجر إلى الولايات المتحدة، وعمل لفترة قصيرة مع المخترع توماس إديسون قبل أن ينفصل عنه لاختلاف الرؤى حول أنظمة الكهرباء.'},
+   {y:'«حرب التيارات»', t:'أثبتت أبحاثه تفوّق التيار المتردد (AC) على التيار المستمر (DC) في نقل الكهرباء لمسافات طويلة — وهو النظام المعتمد عالميًا حتى اليوم.'},
+   {y:'١٩٤٣م', t:'توفي في مدينة نيويورك، تاركًا أكثر من ٣٠٠ براءة اختراع.'},
+ ],
+ achievements:[
+   'تطوير نظام التيار المتردد (AC) المستخدم عالميًا في نقل الكهرباء وتوزيعها.',
+   'اختراع المحرك الحثي (Induction Motor) وتصميم محولات كهربائية حديثة.',
+   'اختراع ملف تسلا (Tesla Coil) وأجهزة توليد الترددات العالية.',
+   'الإسهام في تطوير تقنيات الإرسال اللاسلكي للطاقة والإشارات وتجارب الراديو المبكرة.',
+   'تسجيل أكثر من ٣٠٠ براءة اختراع في عدد من الدول.',
+ ],
+ works:['ملف تسلا (Tesla Coil)','المحرك الحثي','مولدات ومحولات التيار المتردد','أنظمة نقل الكهرباء لمسافات طويلة'],
+ influence:'أحدثت ابتكاراته ثورة في أنظمة الكهرباء الحديثة ومهّدت الطريق لتطور الاتصالات اللاسلكية؛ وتكريمًا له أُطلق اسمه على وحدة قياس كثافة المجال المغناطيسي (Tesla) في النظام الدولي للوحدات.',
+ funFact:'رغم تسجيله أكثر من ٣٠٠ براءة اختراع وتغيير العالم بالكهرباء، توفي تسلا في غرفة فندق بنيويورك شبه منسي ماليًا، قبل أن يُعاد الاعتبار لإرثه العلمي عقودًا لاحقًا.',
+ sources:['Bernard Carlson، Tesla: Inventor of the Electrical Age','مكتبة الكونغرس الأمريكية (Library of Congress)','معهد مهندسي الكهرباء والإلكترونيات (IEEE)','Encyclopaedia Britannica، مادة: Nikola Tesla','متحف نيكولا تسلا – بلغراد']
+},
+];
+
+/* network connections: person -> field/concept -> modern outcome */
+const NET_EXTRA = [
+  {id:'f-algebra', label:'علم الجبر', group:'field'},
+  {id:'f-cs', label:'علوم الحاسب', group:'field'},
+  {id:'f-optics', label:'علم البصريات', group:'field'},
+  {id:'f-modern-sci', label:'العلوم الحديثة', group:'field'},
+  {id:'f-medicine', label:'الطب السريري', group:'field'},
+  {id:'f-cardiac', label:'جراحة القلب المعاصرة', group:'field'},
+  {id:'f-chem', label:'الكيمياء التجريبية', group:'field'},
+  {id:'f-femto', label:'كيمياء الفيمتوثانية', group:'field'},
+  {id:'f-nano', label:'كيمياء النانو', group:'field'},
+  {id:'f-crypto', label:'علم التشفير', group:'field'},
+  {id:'f-mech', label:'الهندسة الميكانيكية', group:'field'},
+  {id:'f-robotics', label:'الروبوتات', group:'field'},
+  {id:'f-astro-instr', label:'الآلات الفلكية', group:'field'},
+  {id:'f-solar', label:'فيزياء الفلك المعاصرة', group:'field'},
+  {id:'f-nuclear', label:'الطاقة الذرية السلمية', group:'field'},
+  {id:'f-ac-power', label:'التيار المتردد وشبكات الكهرباء', group:'field'},
+  {id:'f-wireless', label:'الاتصالات اللاسلكية', group:'field'},
+];
+const NET_EDGES = [
+  ['al-khwarizmi','f-algebra'], ['f-algebra','f-cs'],
+  ['ibn-alhaytham','f-optics'], ['f-optics','f-modern-sci'],
+  ['ibn-sina','f-medicine'], ['f-medicine','f-cardiac'], ['magdi-yacoub','f-cardiac'],
+  ['al-razi','f-medicine'], ['al-razi','f-chem'], ['f-chem','f-nano'], ['f-chem','f-femto'],
+  ['mostafa-elsayed','f-nano'], ['ahmed-zewail','f-femto'],
+  ['al-kindi','f-crypto'],
+  ['al-jazari','f-mech'], ['f-mech','f-robotics'],
+  ['mariam-alijliya','f-astro-instr'], ['f-astro-instr','f-solar'], ['shadia-habbal','f-solar'],
+  ['samira-moussa','f-nuclear'],
+  ['nikola-tesla','f-ac-power'], ['f-ac-power','f-modern-sci'],
+  ['nikola-tesla','f-wireless'], ['f-wireless','f-modern-sci'],
+];
+
+/* ============ quiz question bank ============ */
+const QUIZ_BANK = {
+'ibn-alhaytham':[
+  {q:'في أي مدينة وُلد الحسن بن الهيثم؟', choices:['البصرة','بغداد','القاهرة','دمشق'], correct:0, level:'سهل'},
+  {q:'بأي علم اشتهر ابن الهيثم بشكل خاص؟', choices:['البصريات','الجبر','الفلك وحده','جراحة القلب'], correct:0, level:'سهل'},
+  {q:'ما اسم أشهر مؤلفات ابن الهيثم؟', choices:['كتاب المناظر','القانون في الطب','الجبر والمقابلة','الحاوي'], correct:0, level:'متوسط'},
+  {q:'ما الجهاز الذي وضع ابن الهيثم أسسه ويُعد أساس الكاميرا الحديثة؟', choices:['الكاميرا المظلمة (الغرفة المظلمة)','الأسطرلاب','الساعة المائية','المجهر'], correct:0, level:'متوسط'},
+  {q:'في أي مدينة توفي ابن الهيثم؟', choices:['القاهرة','بغداد','البصرة','دمشق'], correct:0, level:'صعب'},
+  {q:'كم عدد الأجزاء التي يتكوّن منها كتاب المناظر؟', choices:['سبعة أجزاء','ثلاثة أجزاء','عشرة أجزاء','جزء واحد'], correct:0, level:'سهل'},
+  {q:'ما اللقب الذي اشتهر به ابن الهيثم؟', choices:['أبو علم البصريات الحديث','أبو الجبر','أمير الأطباء','فيلسوف العرب'], correct:0, level:'متوسط'},
+  {q:'أي مشروع هندسي كُلّف ابن الهيثم بدراسته في مصر؟', choices:['تنظيم فيضان نهر النيل','بناء قناة السويس','تحصين الإسكندرية','بناء الأهرامات'], correct:0, level:'متوسط'},
+  {q:'كم عدد الكتب والرسائل التي ألّفها ابن الهيثم تقريبًا؟', choices:['أكثر من ٢٠٠','أكثر من ٥٠','أكثر من ١٠٠٠','أقل من ٥٠'], correct:0, level:'صعب'},
+  {q:'أي جهة أطلقت اسم ابن الهيثم على إحدى الفوهات القمرية؟', choices:['وكالة الفضاء الأوروبية','وكالة ناسا','وكالة الفضاء الروسية','الأمم المتحدة'], correct:0, level:'صعب'},
+],
+'ibn-sina':[
+  {q:'بأي لقب اشتهر ابن سينا؟', choices:['الشيخ الرئيس','فيلسوف العرب','أبو الجبر','أبو الهندسة'], correct:0, level:'سهل'},
+  {q:'ما أشهر كتاب لابن سينا في الطب؟', choices:['القانون في الطب','الحاوي','كتاب المناظر','الجبر والمقابلة'], correct:0, level:'سهل'},
+  {q:'بالقرب من أي مدينة وُلد ابن سينا؟', choices:['بخارى','بغداد','القاهرة','قرطبة'], correct:0, level:'متوسط'},
+  {q:'في أي مدينة توفي ابن سينا؟', choices:['همذان','بخارى','بغداد','دمشق'], correct:0, level:'متوسط'},
+  {q:'باسم Avicenna، من هو العالم المعروف بهذا الاسم في أوروبا؟', choices:['ابن سينا','ابن الهيثم','الرازي','الخوارزمي'], correct:0, level:'صعب'},
+  {q:'في أي سن حفظ ابن سينا القرآن الكريم؟', choices:['العاشرة','الخامسة','الخامسة عشرة','العشرين'], correct:0, level:'سهل'},
+  {q:'كم عدد الكتب والرسائل التي ألّفها ابن سينا تقريبًا؟', choices:['أكثر من ٢٥٠','أكثر من ٥٠','أكثر من ١٠٠٠','أقل من ٥٠'], correct:0, level:'متوسط'},
+  {q:'ما اسم كتاب ابن سينا الفلسفي الذي جمع فيه المنطق والطبيعيات والإلهيات؟', choices:['الشفاء','القانون في الطب','الإشارات والتنبيهات','النجاة'], correct:0, level:'متوسط'},
+  {q:'حتى أي قرن ظل كتاب القانون في الطب يُدرّس في الجامعات الأوروبية؟', choices:['القرن السابع عشر','القرن الثالث عشر','القرن التاسع عشر','القرن العشرين'], correct:0, level:'صعب'},
+  {q:'أي مكتبة أتيحت لابن سينا الاطلاع عليها بعد علاجه لأمير بخارى؟', choices:['مكتبة الدولة السامانية الملكية','بيت الحكمة','مكتبة الإسكندرية','دار الحكمة الفاطمية'], correct:0, level:'صعب'},
+],
+'al-kindi':[
+  {q:'بأي لقب عُرف الكندي؟', choices:['فيلسوف العرب','الشيخ الرئيس','أبو الجبر','أبو الطب'], correct:0, level:'سهل'},
+  {q:'في أي مدينة وُلد الكندي؟', choices:['الكوفة','بغداد','البصرة','دمشق'], correct:0, level:'سهل'},
+  {q:'بأي علم يرتبط اسم الكندي كرائد فيه إلى جانب الفلسفة؟', choices:['تحليل الشيفرات (التشفير)','الجراحة','الفلك وحده','الهندسة الميكانيكية'], correct:0, level:'متوسط'},
+  {q:'ما اسم مركز الترجمة والعلم الذي عمل فيه الكندي ببغداد؟', choices:['بيت الحكمة','الأزهر','دار العلم','المرصد الكبير'], correct:0, level:'متوسط'},
+  {q:'ما اسم رسالة الكندي الشهيرة في فك الشيفرة؟', choices:['استخراج المعمّى','الجبر والمقابلة','كتاب المناظر','القانون في الطب'], correct:0, level:'صعب'},
+  {q:'إلى أي قبيلة عربية ينتمي الكندي؟', choices:['قبيلة كندة','قريش','تميم','الأزد'], correct:0, level:'سهل'},
+  {q:'كم عدد الكتب والرسائل التي ألّفها الكندي تقريبًا؟', choices:['أكثر من ٢٦٠','أكثر من ٥٠','أكثر من ١٠٠٠','أقل من ٥٠'], correct:0, level:'متوسط'},
+  {q:'أي أسلوب رياضي طوّره الكندي لفك الرسائل المشفّرة؟', choices:['تحليل التكرار (التردد)','التحليل الهندسي','حساب المثلثات','الجبر الخطي'], correct:0, level:'متوسط'},
+  {q:'في عهد أي خليفة عباسي عمل الكندي في بيت الحكمة بشكل بارز؟', choices:['المأمون','هارون الرشيد','المتوكل وحده','الأمين'], correct:0, level:'صعب'},
+  {q:'أي فيلسوفين يونانيين ترجم الكندي وشرح أعمالهما؟', choices:['أرسطو وأفلاطون','سقراط وفيثاغورس','إقليدس وأرخميدس','بطليموس وجالينوس'], correct:0, level:'صعب'},
+],
+'al-razi':[
+  {q:'بأي إنجاز طبي اشتهر الرازي تحديدًا؟', choices:['التمييز بين الجدري والحصبة','اكتشاف الدورة الدموية','تشريح العين','اختراع الأسطرلاب'], correct:0, level:'سهل'},
+  {q:'ما اسم موسوعة الرازي الطبية الكبرى؟', choices:['الحاوي','القانون في الطب','كتاب المناظر','الشفاء'], correct:0, level:'سهل'},
+  {q:'في أي مدينة وُلد الرازي؟', choices:['الري','بغداد','البصرة','القاهرة'], correct:0, level:'متوسط'},
+  {q:'أي مستشفى تولى الرازي إدارته، واختار موقعه بطريقة علمية؟', choices:['مستشفى بغداد','مستشفى القاهرة','مستشفى دمشق','مستشفى قرطبة'], correct:0, level:'متوسط'},
+  {q:'بأي اسم لاتيني عُرف الرازي في أوروبا؟', choices:['Rhazes','Avicenna','Alhazen','Algoritmi'], correct:0, level:'صعب'},
+  {q:'بأي اهتمام بدأ الرازي حياته قبل أن يتجه للطب؟', choices:['الموسيقى والأدب والفلسفة','الزراعة','التجارة','الجندية'], correct:0, level:'سهل'},
+  {q:'كم عدد الكتب والرسائل التي ألّفها الرازي تقريبًا؟', choices:['أكثر من ٢٠٠','أكثر من ٥٠','أكثر من ١٠٠٠','أقل من ٥٠'], correct:0, level:'متوسط'},
+  {q:'أي مادة استخدمها الرازي في تعقيم الجروح والأدوات الطبية؟', choices:['الكحول','الخل','ماء الورد','الملح'], correct:0, level:'متوسط'},
+  {q:'ما اسم كتاب الرازي الموجّه لمن لا يستطيع الوصول إلى طبيب؟', choices:['من لا يحضره الطبيب','الحاوي','الطب الروحاني','المنصوري في الطب'], correct:0, level:'صعب'},
+  {q:'بأي مجال إلى جانب الطب برز الرازي أيضًا؟', choices:['الكيمياء','الفلك وحده','الهندسة الميكانيكية','علم التشفير'], correct:0, level:'صعب'},
+],
+'al-khwarizmi':[
+  {q:'بأي علم ارتبط اسم الخوارزمي بشكل أساسي؟', choices:['الجبر','الطب','البصريات','جراحة القلب'], correct:0, level:'سهل'},
+  {q:'أي كلمة إنجليزية اشتُقت من اسم الخوارزمي اللاتيني؟', choices:['Algorithm','Algebra','Chemistry','Optics'], correct:0, level:'سهل'},
+  {q:'ما اسم كتاب الخوارزمي الذي أسس علم الجبر؟', choices:['الجبر والمقابلة','المناظر','الحاوي','القانون'], correct:0, level:'متوسط'},
+  {q:'في أي إقليم وُلد الخوارزمي على الأرجح؟', choices:['خوارزم','الكوفة','الري','حلب'], correct:0, level:'متوسط'},
+  {q:'في أي مؤسسة عمل الخوارزمي ببغداد؟', choices:['بيت الحكمة','الأزهر','دار العلم بالقاهرة','المرصد السمرقندي'], correct:0, level:'صعب'},
+  {q:'أي نظام عددي ساهم الخوارزمي في نشره في أوروبا؟', choices:['النظام العددي الهندي (العربي) والصفر','النظام الروماني','النظام الست عشري','النظام الثنائي'], correct:0, level:'سهل'},
+  {q:'ما اسم كتاب الخوارزمي في الفلك؟', choices:['زيج السند هند','الجبر والمقابلة','صورة الأرض','القانون'], correct:0, level:'متوسط'},
+  {q:'ما اسم كتاب الخوارزمي في الجغرافيا؟', choices:['صورة الأرض','زيج السند هند','كتاب العمل بالإسطرلاب','الجبر والمقابلة'], correct:0, level:'متوسط'},
+  {q:'في عهد أي خليفة عباسي عمل الخوارزمي في بيت الحكمة؟', choices:['المأمون','هارون الرشيد','المتوكل وحده','الأمين'], correct:0, level:'صعب'},
+  {q:'ماذا قدّم الخوارزمي في مجال الجغرافيا إلى جانب الرياضيات والفلك؟', choices:['تصحيح أخطاء بطليموس ورسم خرائط أدق','اكتشاف قارات جديدة','تحديد دوران الأرض','قياس محيط الأرض'], correct:0, level:'صعب'},
+],
+'al-jazari':[
+  {q:'بأي مجال اشتهر بديع الزمان الجزري؟', choices:['الهندسة الميكانيكية والاختراعات','الطب','الفلسفة','التشفير'], correct:0, level:'سهل'},
+  {q:'ما أشهر اختراعات الجزري؟', choices:['ساعة الفيل','الأسطرلاب','الكاميرا المظلمة','القانون في الطب'], correct:0, level:'سهل'},
+  {q:'ما اسم كتاب الجزري الذي وثّق فيه اختراعاته؟', choices:['الجامع بين العلم والعمل النافع في صناعة الحيل','رسالة في الآلات','ديوان الجزري','كتاب الحيل المختصر'], correct:0, level:'متوسط'},
+  {q:'أي آلية طورها الجزري تحوّل الحركة الدائرية إلى ترددية، وتُستخدم اليوم في المحركات؟', choices:['عمود المرفق (Crankshaft)','الترس المخروطي','الرافعة','البكرة'], correct:0, level:'متوسط'},
+  {q:'في بلاط أي أسرة حاكمة عمل الجزري كبيرًا للمهندسين؟', choices:['الأرتقيين بديار بكر','الحمدانيين بحلب','الفاطميين بمصر','العباسيين ببغداد'], correct:0, level:'صعب'},
+  {q:'كم عامًا قضى الجزري تقريبًا في تصميم الآلات وصيانتها للبلاط الأرتقي؟', choices:['أكثر من ٢٥ عامًا','٥ أعوام','١٠٠ عام','عامين'], correct:0, level:'سهل'},
+  {q:'كم عدد الآلات التي وثّقها الجزري في كتابه؟', choices:['أكثر من ٥٠ آلة','١٠ آلات','٥ آلات','أكثر من ٥٠٠ آلة'], correct:0, level:'متوسط'},
+  {q:'أي نوع من الآلات صممها الجزري لرفع المياه؟', choices:['مضخات بالكرنك والمرفق','نواعير خشبية فقط','سواقي يدوية بلا آلية','لا شيء مما ذكر'], correct:0, level:'متوسط'},
+  {q:'بأي وصف يُلقّب الجزري في تاريخ الهندسة؟', choices:['أبو الهندسة الميكانيكية','أبو الجبر','أبو البصريات','أبو الطب'], correct:0, level:'صعب'},
+  {q:'أي نوع من الآلات الموسيقية صممها الجزري لتعمل ذاتيًا؟', choices:['آلات موسيقية ميكانيكية (أوتوماتا)','آلات وترية يدوية فقط','أجراس الكنائس','لا شيء مما ذكر'], correct:0, level:'صعب'},
+],
+'mariam-alijliya':[
+  {q:'بأي حرفة اشتهرت مريم الإسطرلابية؟', choices:['صناعة الأسطرلابات','الطب','الترجمة','الجراحة'], correct:0, level:'سهل'},
+  {q:'في أي مدينة عاشت وعملت مريم الإسطرلابية؟', choices:['حلب','بغداد','القاهرة','قرطبة'], correct:0, level:'سهل'},
+  {q:'في بلاط أي أمير عملت مريم الإسطرلابية؟', choices:['سيف الدولة الحمداني','هارون الرشيد','صلاح الدين الأيوبي','عبد الرحمن الناصر'], correct:0, level:'متوسط'},
+  {q:'من ذكر مريم الإسطرلابية في كتابه "الفهرست"؟', choices:['ابن النديم','ابن سينا','ابن النفيس','الجاحظ'], correct:0, level:'متوسط'},
+  {q:'على يد من تتلمذت مريم الإسطرلابية في صناعة الأسطرلاب؟', choices:['الأستاذ بطلمس الإسطرلابي','الخوارزمي','الكندي','الرازي'], correct:0, level:'صعب'},
+  {q:'بماذا يفيد الأسطرلاب الذي صنعته مريم في الاستخدامات الدينية؟', choices:['تحديد اتجاه القبلة ومواقيت الصلاة','لا علاقة له بالدين','لتحديد الوزن','لتحديد درجة الحرارة'], correct:0, level:'سهل'},
+  {q:'أي مهارة إضافية أبدعت فيها مريم في صناعة الأسطرلاب؟', choices:['نقش التدريجات والزوايا بدقة عالية','صناعة الزجاج','الخط العربي فقط','صياغة الذهب'], correct:0, level:'متوسط'},
+  {q:'بأي اسم آخر عُرفت مريم الإسطرلابية؟', choices:['مريم العجلية','مريم البصرية','مريم القرطبية','مريم الدمشقية'], correct:0, level:'متوسط'},
+  {q:'في أي قرن يُرجّح ميلاد مريم الإسطرلابية؟', choices:['أوائل القرن العاشر الميلادي','القرن الثامن','القرن الثالث عشر','القرن الخامس عشر'], correct:0, level:'صعب'},
+  {q:'ماذا ورثت مريم عن والدها؟', choices:['حرفة صناعة الأسطرلابات','حرفة الطب','حرفة الترجمة','حرفة الجندية'], correct:0, level:'صعب'},
+],
+'mostafa-elsayed':[
+  {q:'في أي مجال علمي برز الدكتور مصطفى السيد؟', choices:['كيمياء النانو','جراحة القلب','الفيزياء الذرية','علم الفلك'], correct:0, level:'سهل'},
+  {q:'في أي دولة وُلد الدكتور مصطفى السيد؟', choices:['مصر','سوريا','الأردن','العراق'], correct:0, level:'سهل'},
+  {q:'بأي جامعة أمريكية يعمل الدكتور مصطفى السيد أستاذًا؟', choices:['معهد جورجيا للتكنولوجيا','جامعة هارفارد','معهد كالتك','جامعة ييل'], correct:0, level:'متوسط'},
+  {q:'أي نوع من الجسيمات النانوية ركّزت أبحاثه على استخدامه في تشخيص وعلاج السرطان؟', choices:['جسيمات الذهب النانوية','جسيمات الفضة','جسيمات الحديد','جسيمات الكربون'], correct:0, level:'متوسط'},
+  {q:'من أي جامعة مصرية حصل الدكتور مصطفى السيد على البكالوريوس؟', choices:['جامعة عين شمس','جامعة القاهرة','جامعة الإسكندرية','جامعة دمشق'], correct:0, level:'صعب'},
+  {q:'ما اسم فرع الكيمياء الذي يدرس تفاعل الضوء مع الجسيمات النانوية والذي يُعد الدكتور مصطفى السيد من رواده؟', choices:['البلازمونيات','الكيمياء العضوية','الكيمياء التحليلية الكلاسيكية','كيمياء البوليمرات'], correct:0, level:'سهل'},
+  {q:'كم بحثًا علميًا نشره الدكتور مصطفى السيد تقريبًا؟', choices:['أكثر من ٧٠٠','أقل من ١٠٠','حوالي ٥٠','أكثر من ٥٠٠٠'], correct:0, level:'متوسط'},
+  {q:'أي وسام مصري رفيع حصل عليه الدكتور مصطفى السيد؟', choices:['قلادة النيل العظمى','وسام الجمهورية','نجمة سيناء','لا شيء مما ذكر'], correct:0, level:'متوسط'},
+  {q:'في أي عام حصل الدكتور مصطفى السيد على الدكتوراه؟', choices:['١٩٥٨م','١٩٦٥م','١٩٤٥م','١٩٧٠م'], correct:0, level:'صعب'},
+  {q:'عضوية أي أكاديمية أمريكية مرموقة يحملها الدكتور مصطفى السيد؟', choices:['الأكاديمية الوطنية الأمريكية للعلوم','أكاديمية الفنون','الأكاديمية الطبية الملكية','لا شيء مما ذكر'], correct:0, level:'صعب'},
+],
+'ahmed-zewail':[
+  {q:'بأي جائزة عالمية فاز أحمد زويل عام ١٩٩٩؟', choices:['جائزة نوبل في الكيمياء','جائزة الملك فيصل','وسام الاستحقاق','جائزة تورينج'], correct:0, level:'سهل'},
+  {q:'بأي علم يرتبط اسم أحمد زويل؟', choices:['كيمياء الفيمتوثانية','الفيزياء النووية','جراحة القلب','كيمياء النانو'], correct:0, level:'سهل'},
+  {q:'في أي مدينة مصرية وُلد أحمد زويل؟', choices:['دمنهور','الإسكندرية','القاهرة','أسوان'], correct:0, level:'متوسط'},
+  {q:'في أي معهد أمريكي أجرى أحمد زويل أبحاثه الأساسية؟', choices:['معهد كاليفورنيا للتكنولوجيا (كالتك)','معهد جورجيا للتكنولوجيا','جامعة هارفارد','جامعة بنسلفانيا'], correct:0, level:'متوسط'},
+  {q:'بأي وحدة زمنية تُقاس التفاعلات الكيميائية في كيمياء الفيمتو؟', choices:['الفيمتوثانية','النانوثانية','الميكروثانية','المللي ثانية'], correct:0, level:'صعب'},
+  {q:'من أي جامعة مصرية تخرج أحمد زويل؟', choices:['جامعة الإسكندرية','جامعة القاهرة','جامعة عين شمس','جامعة أسيوط'], correct:0, level:'سهل'},
+  {q:'من أي جامعة أمريكية حصل أحمد زويل على الدكتوراه؟', choices:['جامعة بنسلفانيا','جامعة هارفارد','معهد كالتك','جامعة ييل'], correct:0, level:'متوسط'},
+  {q:'ما اسم أحد كتب أحمد زويل غير العلمية المتخصصة؟', choices:['رحلة عبر الزمن','القانون في الطب','الحاوي','الجبر والمقابلة'], correct:0, level:'متوسط'},
+  {q:'في أي مدينة أمريكية توفي أحمد زويل؟', choices:['باسادينا','نيويورك','شيكاغو','بوسطن'], correct:0, level:'صعب'},
+  {q:'ماذا أسّس أحمد زويل في مصر لدعم البحث العلمي؟', choices:['مدينة زويل للعلوم والتكنولوجيا والابتكار','جامعة النيل','معهد ناصر','أكاديمية البحث العلمي'], correct:0, level:'صعب'},
+],
+'magdi-yacoub':[
+  {q:'بأي تخصص طبي اشتهر السير مجدي يعقوب؟', choices:['جراحة القلب وزراعته','طب العيون','جراحة الأعصاب','الطب النووي'], correct:0, level:'سهل'},
+  {q:'من أي جامعة مصرية تخرج مجدي يعقوب في كلية الطب؟', choices:['جامعة القاهرة','جامعة عين شمس','جامعة الإسكندرية','جامعة أسيوط'], correct:0, level:'سهل'},
+  {q:'في أي مستشفى بريطاني أسّس مجدي يعقوب مركز زراعة القلب؟', choices:['مستشفى هارفيلد','مستشفى سانت توماس','مستشفى جاي','مستشفى أكسفورد'], correct:0, level:'متوسط'},
+  {q:'في أي مدينة مصرية أسّس مجدي يعقوب مركزه العالمي لجراحة القلب؟', choices:['أسوان','دمنهور','بلبيس','طنطا'], correct:0, level:'متوسط'},
+  {q:'أي لقب منحته ملكة بريطانيا للدكتور مجدي يعقوب تقديرًا لإسهاماته؟', choices:['لقب "سير" (Knight)','لقب "لورد"','وسام فيكتوريا','لا شيء مما ذكر'], correct:0, level:'صعب'},
+  {q:'في أي عام وُلد مجدي يعقوب؟', choices:['١٩٣٥م','١٩٤٥م','١٩٢٥م','١٩٥٥م'], correct:0, level:'سهل'},
+  {q:'ما مهنة والد مجدي يعقوب التي أثّرت في اختياره الطب؟', choices:['كان طبيبًا','كان مهندسًا','كان معلمًا','كان تاجرًا'], correct:0, level:'متوسط'},
+  {q:'ماذا تدعم مؤسسة مجدي يعقوب في أسوان بجانب علاج المرضى؟', choices:['تدريب الأطباء وإجراء الأبحاث','التبشير الديني','التجارة الدولية','لا شيء مما ذكر'], correct:0, level:'متوسط'},
+  {q:'بأي وسام مصري كُرّم مجدي يعقوب؟', choices:['قلادة النيل العظمى','وسام الجمهورية','نجمة سيناء','لا شيء مما ذكر'], correct:0, level:'صعب'},
+  {q:'أي جائزة عالمية في الطب حصل عليها مجدي يعقوب؟', choices:['جائزة الملك فيصل العالمية في الطب','جائزة نوبل','جائزة تورينج','جائزة الملك عبدالله'], correct:0, level:'صعب'},
+],
+'shadia-habbal':[
+  {q:'بأي مجال علمي تخصصت شادية الرفاعي حبال؟', choices:['فيزياء الشمس','الفيزياء النووية','كيمياء النانو','جراحة القلب'], correct:0, level:'سهل'},
+  {q:'في أي مدينة وُلدت شادية حبال؟', choices:['حمص','دمشق','عمّان','بيروت'], correct:0, level:'سهل'},
+  {q:'ما الظاهرة الفلكية التي تسافر شادية حبال حول العالم لرصدها؟', choices:['كسوف الشمس الكلي','خسوف القمر','عبور الزهرة','الشفق القطبي'], correct:0, level:'متوسط'},
+  {q:'بأي جامعة أمريكية تعمل شادية حبال أستاذة حاليًا؟', choices:['جامعة هاواي','جامعة أريزونا','جامعة هارفارد','معهد كالتك'], correct:0, level:'متوسط'},
+  {q:'ما الجزء من الشمس الذي تركز عليه أبحاث شادية حبال؟', choices:['الهالة الشمسية','النواة الشمسية','البقع الشمسية فقط','الغلاف الضوئي'], correct:0, level:'صعب'},
+  {q:'من أي جامعة سورية حصلت شادية حبال على البكالوريوس؟', choices:['جامعة دمشق','جامعة حلب','الجامعة الأمريكية ببيروت','جامعة القاهرة'], correct:0, level:'سهل'},
+  {q:'من أي جامعة أمريكية حصلت شادية حبال على الدكتوراه؟', choices:['جامعة سينسيناتي','جامعة هارفارد','معهد كالتك','جامعة ييل'], correct:0, level:'متوسط'},
+  {q:'منذ أي عام بدأت شادية حبال قيادة بعثات رصد كسوف الشمس؟', choices:['منذ ١٩٩٥م','منذ ٢٠١٠م','منذ ١٩٨٠م','منذ ٢٠٠٠م'], correct:0, level:'متوسط'},
+  {q:'أي مركز بحثي أمريكي انضمت إليه شادية حبال في بداية مسيرتها؟', choices:['مركز هارفارد-سميثسونيان للفيزياء الفلكية','معهد كالتك','وكالة ناسا','مختبر لوس ألاموس'], correct:0, level:'صعب'},
+  {q:'ماذا تدرس أبحاث شادية حبال بجانب الهالة الشمسية؟', choices:['الرياح الشمسية والطقس الفضائي','حلقات زحل','الثقوب السوداء','المريخ'], correct:0, level:'صعب'},
+],
+'samira-moussa':[
+  {q:'في أي مجال علمي عملت سميرة موسى؟', choices:['الفيزياء الذرية','الطب','الهندسة الميكانيكية','علم الفلك'], correct:0, level:'سهل'},
+  {q:'ما الشعار الذي اشتهرت به سميرة موسى في دعوتها لاستخدام الطاقة الذرية سلميًا؟', choices:['"الذرة من أجل السلام"','"العلم للجميع"','"المعرفة قوة"','"نحو مستقبل أفضل"'], correct:0, level:'سهل'},
+  {q:'من أي جامعة مصرية تخرجت سميرة موسى؟', choices:['جامعة فؤاد الأول (القاهرة حاليًا)','جامعة عين شمس','جامعة الإسكندرية','جامعة أسيوط'], correct:0, level:'متوسط'},
+  {q:'أين توفيت سميرة موسى عام ١٩٥٢؟', choices:['الولايات المتحدة الأمريكية','مصر','بريطانيا','فرنسا'], correct:0, level:'متوسط'},
+  {q:'أي منصب أكاديمي كانت سميرة موسى أول امرأة تشغله في جامعة القاهرة؟', choices:['أول معيدة في كلية العلوم','أول عميدة كلية','أول رئيسة جامعة','أول أستاذة فيزياء نظرية'], correct:0, level:'صعب'},
+  {q:'في أي عام تخرجت سميرة موسى من الجامعة؟', choices:['١٩٣٩م','١٩٥٠م','١٩٢٥م','١٩٤٥م'], correct:0, level:'سهل'},
+  {q:'ما موضوع رسالة الماجستير التي حصلت عليها سميرة موسى؟', choices:['التوصيل الحراري للغازات','الأشعة السينية','الطاقة الذرية','الميكانيكا الكمية'], correct:0, level:'متوسط'},
+  {q:'بأي دولة نالت سميرة موسى درجة الدكتوراه؟', choices:['بريطانيا','الولايات المتحدة','فرنسا','ألمانيا'], correct:0, level:'متوسط'},
+  {q:'أي عالم مصري شجّع سميرة موسى على التخصص في الفيزياء النووية؟', choices:['علي مصطفى مشرفة','أحمد زويل','مصطفى السيد','مجدي يعقوب'], correct:0, level:'صعب'},
+  {q:'بأي لقب عُرفت سميرة موسى تكريمًا لها؟', choices:['"مدام كوري الشرق"','"سيدة الذرة الأولى"','"أم العلوم"','"فخر مصر"'], correct:0, level:'صعب'},
+],
+'nikola-tesla':[
+  {q:'بأي نظام كهربائي اشتهر نيكولا تسلا؟', choices:['التيار المتردد (AC)','التيار المستمر (DC) فقط','الطاقة الشمسية','الطاقة النووية'], correct:0, level:'سهل'},
+  {q:'في أي بلد وُلد نيكولا تسلا؟', choices:['ضمن الإمبراطورية النمساوية (كرواتيا حاليًا)','الولايات المتحدة','ألمانيا','بريطانيا'], correct:0, level:'سهل'},
+  {q:'مع أي مخترع أمريكي عمل تسلا قبل أن ينفصل عنه؟', choices:['توماس إديسون','ألكسندر غراهام بيل','هنري فورد','جيمس واط'], correct:0, level:'متوسط'},
+  {q:'ما اسم الاختراع الشهير المرتبط باسم تسلا ويُستخدم في توليد الترددات العالية؟', choices:['ملف تسلا (Tesla Coil)','المحرك البخاري','الترانزستور','الدينامو'], correct:0, level:'متوسط'},
+  {q:'بأي نزاع تقني اشتهرت المنافسة بين تيار تسلا المتردد وتيار إديسون المستمر؟', choices:['حرب التيارات','حرب الكهرباء','حرب المحركات','حرب الترددات'], correct:0, level:'صعب'},
+  {q:'كم براءة اختراع سجّلها نيكولا تسلا تقريبًا؟', choices:['أكثر من ٣٠٠','أقل من ٥٠','حوالي ١٠','أكثر من ٣٠٠٠'], correct:0, level:'متوسط'},
+  {q:'أي محرك كهربائي اخترعه تسلا ويُعد من أهم إنجازاته؟', choices:['المحرك الحثي (Induction Motor)','المحرك البخاري','المحرك النفاث','محرك الاحتراق الداخلي'], correct:0, level:'متوسط'},
+  {q:'بأي مدينة أمريكية توفي نيكولا تسلا؟', choices:['نيويورك','شيكاغو','بوسطن','لوس أنجلوس'], correct:0, level:'صعب'},
+  {q:'بأي وحدة قياس فيزيائية أُطلق اسم تسلا تكريمًا له؟', choices:['وحدة قياس كثافة المجال المغناطيسي (Tesla)','وحدة قياس الجهد الكهربائي','وحدة قياس الطاقة','وحدة قياس المقاومة'], correct:0, level:'صعب'},
+  {q:'في أي جامعة درس تسلا الهندسة الكهربائية؟', choices:['الجامعة التقنية في غراتس بالنمسا','جامعة برلين','جامعة كامبريدج','جامعة باريس'], correct:0, level:'صعب'},
+],
+};
+
+/* ============ helpers ============ */
+const byId = id => SCIENTISTS.find(s=>s.id===id);
+function medallionStyle(s){
+  const c = FIELDS[s.field].color;
+  return `background:linear-gradient(140deg, ${c}, ${shade(c,-25)});`;
+}
+function shade(hex, pct){
+  const n = parseInt(hex.slice(1),16);
+  let r=(n>>16)+Math.round(2.55*pct), g=(n>>8&0xff)+Math.round(2.55*pct), b=(n&0xff)+Math.round(2.55*pct);
+  r=Math.min(255,Math.max(0,r)); g=Math.min(255,Math.max(0,g)); b=Math.min(255,Math.max(0,b));
+  return '#'+(1<<24|r<<16|g<<8|b).toString(16).slice(1);
+}
+function initials(name){ return name.trim()[0]; }
+function medallionImg(s){
+  if(!s.images || !s.images[0]) return '';
+  return `<img src="${s.images[0]}" alt="${s.name}" loading="lazy" onerror="this.remove()">`;
+}
+function creditLine(s){
+  return (s.images && s.images[0]) ? `<div class="img-credit">صورة: ${s.credit||'ويكيميديا كومنز'}</div>` : '';
+}
+
+/* ============ starfield canvas ============ */
+(function(){
+  const c = document.getElementById('stars-canvas');
+  const ctx = c.getContext('2d');
+  let w,h,stars=[];
+  function resize(){
+    w=c.width=innerWidth*devicePixelRatio; h=c.height=innerHeight*devicePixelRatio;
+    c.style.width=innerWidth+'px'; c.style.height=innerHeight+'px';
+    const count = Math.floor((innerWidth*innerHeight)/9000);
+    stars = Array.from({length:count},()=>({
+      x:Math.random()*w, y:Math.random()*h, r:Math.random()*1.4*devicePixelRatio+.2,
+      a:Math.random(), speed:Math.random()*.4+.05, tw:Math.random()*.02+.005
+    }));
+  }
+  let mx=0.5,my=0.5;
+  window.addEventListener('mousemove', e=>{mx=e.clientX/innerWidth; my=e.clientY/innerHeight;});
+  function tick(){
+    ctx.clearRect(0,0,w,h);
+    const px=(mx-.5)*18, py=(my-.5)*18;
+    for(const s of stars){
+      s.a += s.tw; const alpha = .35+Math.abs(Math.sin(s.a))*.65;
+      ctx.beginPath();
+      ctx.fillStyle=`rgba(233,211,160,${alpha})`;
+      ctx.arc(s.x+px, s.y+py, s.r, 0, 7);
+      ctx.fill();
+    }
+    requestAnimationFrame(tick);
+  }
+  resize(); tick();
+  window.addEventListener('resize', resize);
+})();
+
+/* ============ render eras ============ */
+const erasContainer = document.getElementById('eras-container');
+ERAS.forEach((e,i)=>{
+  const row = document.createElement('div');
+  row.className='era';
+  row.innerHTML = i%2===0
+   ? `<div class="era-card"><div class="era-tag">${e.tag}</div><h3>${e.title}</h3><p>${e.desc}</p><span class="era-span">${e.span}</span></div><div class="era-node"></div><div></div>`
+   : `<div></div><div class="era-node"></div><div class="era-card"><div class="era-tag">${e.tag}</div><h3>${e.title}</h3><p>${e.desc}</p><span class="era-span">${e.span}</span></div>`;
+  erasContainer.appendChild(row);
+});
+
+/* ============ render filters + grid ============ */
+const filtersEl = document.getElementById('filters');
+const allChip = mkChip('all','الكل',true);
+filtersEl.appendChild(allChip);
+Object.entries(FIELDS).forEach(([k,v])=> filtersEl.appendChild(mkChip(k,v.label,false)));
+function mkChip(key,label,active){
+  const b=document.createElement('button');
+  b.className='chip'+(active?' active':'');
+  b.textContent=label; b.dataset.key=key;
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    b.classList.add('active');
+    renderGrid(key, document.getElementById('global-search').value);
+  });
+  return b;
+}
+const gridEl = document.getElementById('scientists-grid');
+function renderGrid(filterKey='all', query=''){
+  gridEl.innerHTML='';
+  const q = (query||'').trim().toLowerCase();
+  const list = SCIENTISTS.filter(s=>{
+    const matchField = filterKey==='all' || s.field===filterKey;
+    const hay = (s.name+' '+s.fieldLabel+' '+s.century).toLowerCase();
+    const matchQuery = !q || hay.includes(q);
+    return matchField && matchQuery;
+  });
+  if(!list.length){
+    gridEl.innerHTML = `<div class="compare-empty" style="grid-column:1/-1">لا توجد نتائج مطابقة لبحثك.</div>`;
+    return;
+  }
+  list.forEach((s,idx)=>{
+    const card=document.createElement('div');
+    card.className='card';
+    card.innerHTML = `
+      <div class="medallion" style="${medallionStyle(s)}">${initials(s.short)}${medallionImg(s)}</div>
+      <h4>${s.name}</h4>
+      <div class="field">${s.fieldLabel}</div>
+      <div class="years">${s.years} · ${s.birthplace}</div>
+      <div class="open-hint">افتح الصفحة ←</div>
+    `;
+    card.addEventListener('click',()=>openDetail(s.id));
+    gridEl.appendChild(card);
+    gsap.to(card, {opacity:1, y:0, duration:.6, delay:idx*.04, ease:'power3.out',
+      scrollTrigger:{trigger:card, start:'top 92%'}});
+  });
+}
+renderGrid();
+
+/* global search wiring */
+document.getElementById('global-search').addEventListener('input', (e)=>{
+  const active = document.querySelector('.chip.active');
+  renderGrid(active?active.dataset.key:'all', e.target.value);
+});
+
+/* ============ detail overlay ============ */
+const overlay = document.getElementById('overlay');
+const overlayPanel = document.getElementById('overlay-panel');
+function openDetail(id){
+  const s = byId(id);
+  if(!s) return;
+  overlayPanel.innerHTML = `
+    <button class="overlay-close" onclick="closeDetail()">✕</button>
+    <div class="overlay-hero">
+      <div class="medallion" style="${medallionStyle(s)}">${initials(s.short)}${medallionImg(s)}</div>
+      ${creditLine(s)}
+      <h2>${s.name}</h2>
+      ${s.fullName ? `<div class="meta" style="margin-top:-4px">${s.fullName}</div>` : ''}
+      <div class="field">${s.fieldLabel}</div>
+      <div class="meta">${s.years} &nbsp;·&nbsp; ${s.birthplace} &nbsp;·&nbsp; ${s.century}</div>
+    </div>
+    <div class="overlay-body">
+      <div class="ov-block">
+        <h3><span class="ico"></span> نبذة</h3>
+        <p class="ov-bio">${s.bio}</p>
+      </div>
+      <div class="ov-block">
+        <h3><span class="ico"></span> معرض الصور</h3>
+        <div class="ov-gallery">
+          ${renderGallery(s)}
+        </div>
+      </div>
+      <div class="ov-block">
+        <h3><span class="ico"></span> خط الحياة</h3>
+        <div class="ov-timeline">
+          ${s.timeline.map(t=>`<div class="tl-item"><div class="yr">${t.y}</div><p>${t.t}</p></div>`).join('')}
+        </div>
+      </div>
+      <div class="ov-block">
+        <h3><span class="ico"></span> أبرز الإنجازات</h3>
+        <ul class="ov-list">${s.achievements.map(a=>`<li>${a}</li>`).join('')}</ul>
+      </div>
+      <div class="ov-block">
+        <h3><span class="ico"></span> المؤلفات والاختراعات</h3>
+        <div class="ov-works">${s.works.map(w=>`<span>${w}</span>`).join('')}</div>
+      </div>
+      <div class="ov-block">
+        <h3><span class="ico"></span> الأثر في تطور العلوم</h3>
+        <p class="ov-bio">${s.influence}</p>
+      </div>
+      <div class="ov-block">
+        <h3><span class="ico"></span> هل تعلم؟</h3>
+        <div class="did-you-know">${s.funFact}</div>
+      </div>
+      <div class="ov-block">
+        <h3><span class="ico"></span> المصادر والمراجع</h3>
+        <div class="ov-sources">${s.sources.map(x=>`<span>— ${x}</span>`).join('')}</div>
+      </div>
+    </div>
+  `;
+  overlay.classList.add('open');
+  overlay.scrollTop = 0;
+  document.body.style.overflow='hidden';
+}
+function renderGallery(s){
+  if(!s.images || !s.images.length){
+    return `<div class="compare-empty" style="grid-column:1/-1;padding:20px">لا تتوفر صور موثّقة إضافية لهذا العالِم حاليًا.</div>`;
+  }
+  return s.images.map(url => `
+    <div class="gitem">
+      <img src="${url}" alt="${s.name}" loading="lazy" onerror="this.closest('.gitem').remove()">
+    </div>
+  `).join('') + `<div class="img-credit" style="grid-column:1/-1">المصدر: ${s.credit||'ويكيميديا كومنز'} (تراخيص المشاع الإبداعي / الملكية العامة)</div>`;
+}
+function closeDetail(){
+  overlay.classList.remove('open');
+  document.body.style.overflow='';
+}
+overlay.addEventListener('click', e=>{ if(e.target===overlay) closeDetail(); });
+window.closeDetail = closeDetail;
+
+/* ============ network graph ============ */
+(function(){
+  const svg = document.getElementById('network-svg');
+  const W=1100,H=600;
+  const personNodes = SCIENTISTS.map((s,i)=>({id:s.id,label:s.short,group:'person',ref:s}));
+  const fieldNodes = NET_EXTRA;
+  const nodes = [...personNodes,...fieldNodes];
+
+  // layout: persons on outer ring, fields on inner ring
+  const cx=W/2, cy=H/2+10;
+  const rOuter=250, rInner=120;
+  personNodes.forEach((n,i)=>{
+    const ang = (i/personNodes.length)*Math.PI*2 - Math.PI/2;
+    n.x = cx + rOuter*Math.cos(ang); n.y = cy + rOuter*Math.sin(ang)*0.82;
+  });
+  fieldNodes.forEach((n,i)=>{
+    const ang = (i/fieldNodes.length)*Math.PI*2 - Math.PI/2 + 0.2;
+    n.x = cx + rInner*Math.cos(ang); n.y = cy + rInner*Math.sin(ang)*0.82;
+  });
+  const nodeMap = {}; nodes.forEach(n=>nodeMap[n.id]=n);
+
+  const ns='http://www.w3.org/2000/svg';
+  function el(tag,attrs){ const e=document.createElementNS(ns,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); return e; }
+
+  const edgesLayer = el('g',{});
+  const nodesLayer = el('g',{});
+  svg.appendChild(edgesLayer); svg.appendChild(nodesLayer);
+
+  const edgeEls = NET_EDGES.map(([a,b])=>{
+    const A=nodeMap[a], B=nodeMap[b];
+    if(!A||!B) return null;
+    const mx=(A.x+B.x)/2 + (Math.random()-.5)*40, my=(A.y+B.y)/2 + (Math.random()-.5)*40;
+    const path = el('path',{d:`M ${A.x} ${A.y} Q ${mx} ${my} ${B.x} ${B.y}`, class:'net-edge'});
+    path.dataset.a=a; path.dataset.b=b;
+    edgesLayer.appendChild(path);
+    return path;
+  }).filter(Boolean);
+
+  const adjacency = {};
+  NET_EDGES.forEach(([a,b])=>{ (adjacency[a]=adjacency[a]||new Set()).add(b); (adjacency[b]=adjacency[b]||new Set()).add(a); });
+
+  const nodeEls = {};
+  nodes.forEach(n=>{
+    const g = el('g',{class:`net-node ${n.group}`, transform:`translate(${n.x},${n.y})`});
+    const r = n.group==='person'?15:9;
+    g.appendChild(el('circle',{r}));
+    const label = el('text',{x:0, y:r+16, 'text-anchor':'middle'});
+    label.textContent = n.label;
+    g.appendChild(label);
+    g.style.color = n.group==='person'?'#c9a24c':'#3fb8af';
+    g.addEventListener('mouseenter',()=>highlight(n.id));
+    g.addEventListener('mouseleave',()=>clearHighlight());
+    g.addEventListener('click',()=>{ if(n.group==='person') openDetail(n.id); });
+    nodesLayer.appendChild(g);
+    nodeEls[n.id]=g;
+  });
+
+  function highlight(id){
+    const connected = new Set([id, ...(adjacency[id]||[])]);
+    Object.entries(nodeEls).forEach(([nid,g])=>{
+      g.classList.toggle('dim', !connected.has(nid));
+      g.classList.toggle('hi', connected.has(nid));
+    });
+    edgeEls.forEach(p=>{
+      const hi = p.dataset.a===id || p.dataset.b===id;
+      p.classList.toggle('hi', hi);
+      p.style.opacity = hi ? 1 : 0.08;
+    });
+  }
+  function clearHighlight(){
+    Object.values(nodeEls).forEach(g=>{g.classList.remove('dim');g.classList.remove('hi');});
+    edgeEls.forEach(p=>{p.classList.remove('hi'); p.style.opacity='';});
+  }
+})();
+
+/* ============ comparison ============ */
+const cmpA = document.getElementById('compare-a');
+const cmpB = document.getElementById('compare-b');
+SCIENTISTS.forEach(s=>{
+  cmpA.appendChild(new Option(s.name, s.id));
+  cmpB.appendChild(new Option(s.name, s.id));
+});
+cmpA.selectedIndex=0; cmpB.selectedIndex=1;
+function renderCompare(){
+  const a=byId(cmpA.value), b=byId(cmpB.value);
+  const box=document.getElementById('compare-result');
+  if(!a||!b || a.id===b.id){
+    box.innerHTML = `<div class="compare-empty">اختر عالمين مختلفين لعرض المقارنة.</div>`;
+    return;
+  }
+  const rows = [
+    ['المجال العلمي', a.fieldLabel, b.fieldLabel],
+    ['الحقبة', a.century, b.century],
+    ['مكان الميلاد', a.birthplace, b.birthplace],
+    ['أبرز الإنجازات', a.achievements.slice(0,2).join(' — '), b.achievements.slice(0,2).join(' — ')],
+    ['أهم المؤلفات/الاختراعات', a.works.join('، '), b.works.join('، ')],
+    ['الأثر العلمي', a.influence, b.influence],
+  ];
+  box.innerHTML = `
+  <table class="compare-table">
+    <tr>
+      <th></th>
+      <th><div class="compare-head"><div class="medallion" style="${medallionStyle(a)}">${initials(a.short)}${medallionImg(a)}</div>${a.name}</div></th>
+      <th><div class="compare-head"><div class="medallion" style="${medallionStyle(b)}">${initials(b.short)}${medallionImg(b)}</div>${b.name}</div></th>
+    </tr>
+    ${rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('')}
+  </table>`;
+}
+cmpA.addEventListener('change', renderCompare);
+cmpB.addEventListener('change', renderCompare);
+renderCompare();
+
+/* ============ map (stylized graticule chart) ============ */
+(function(){
+  const svg = document.getElementById('map-svg');
+  const W=1000,H=480;
+  const ns='http://www.w3.org/2000/svg';
+  function el(tag,attrs){ const e=document.createElementNS(ns,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); return e; }
+  // lon range ~20..75, lat range ~15..48 -> project to viewbox with padding
+  const lonMin=15, lonMax=80, latMin=12, latMax=50;
+  function project(lat,lon){
+    const x = ((lon-lonMin)/(lonMax-lonMin)) * (W-160) + 80;
+    const y = H - (((lat-latMin)/(latMax-latMin)) * (H-120) + 60);
+    return [x,y];
+  }
+  // graticule
+  const grid = el('g',{opacity:'0.18'});
+  for(let lon=lonMin; lon<=lonMax; lon+=10){
+    const [x1,y1]=project(latMin,lon), [x2,y2]=project(latMax,lon);
+    grid.appendChild(el('line',{x1,y1,x2,y2,stroke:'#3fb8af','stroke-width':1}));
+  }
+  for(let lat=latMin; lat<=latMax; lat+=8){
+    const [x1,y1]=project(lat,lonMin), [x2,y2]=project(lat,lonMax);
+    grid.appendChild(el('line',{x1,y1,x2,y2,stroke:'#3fb8af','stroke-width':1}));
+  }
+  svg.appendChild(grid);
+  const label = el('text',{x:W/2,y:32,'text-anchor':'middle',fill:'#6c7295','font-size':'12'});
+  label.textContent = 'خريطة تخطيطية تفاعلية — مواقع مواليد العلماء (إسقاط تقريبي)';
+  svg.appendChild(label);
+
+  const tooltip = document.getElementById('map-tooltip');
+  const wrap = document.querySelector('.map-wrap');
+
+  SCIENTISTS.forEach(s=>{
+    const [x,y] = project(s.lat, s.lon);
+    const g = el('g',{class:'map-dot', transform:`translate(${x},${y})`});
+    g.appendChild(el('circle',{r:5}));
+    const t = el('text',{x:0,y:-10,'text-anchor':'middle'});
+    t.textContent = s.short;
+    g.appendChild(t);
+    g.addEventListener('mouseenter',(ev)=>{
+      tooltip.textContent = `${s.name} — ${s.birthplace}`;
+      tooltip.style.opacity=1;
+      const rect = wrap.getBoundingClientRect();
+      const gx = ev.currentTarget.getBoundingClientRect();
+      tooltip.style.left = (gx.left - rect.left + gx.width/2) + 'px';
+      tooltip.style.top = (gx.top - rect.top) + 'px';
+    });
+    g.addEventListener('mouseleave',()=>{ tooltip.style.opacity=0; });
+    g.addEventListener('click',()=> openDetail(s.id));
+    svg.appendChild(g);
+  });
+})();
+
+/* ============ quizzes engine ============ */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+const quizGrid = document.getElementById('quiz-grid');
+const quizStage = document.getElementById('quiz-stage');
+
+function renderQuizGrid(){
+  quizGrid.innerHTML = '';
+  const fullCard = document.createElement('div');
+  fullCard.className = 'quiz-card full';
+  const totalQ = Object.values(QUIZ_BANK).reduce((n,arr)=>n+arr.length,0);
+  fullCard.innerHTML = `
+    <div>
+      <h4 style="font-size:1.35rem;margin-bottom:6px;">🏆 الاختبار الشامل</h4>
+      <div class="qcount">يغطي كل العلماء الثلاثة عشر — ٣٩ سؤالًا بمستويات متدرجة</div>
+    </div>
+    <div class="qgo">ابدأ الاختبار ←</div>
+  `;
+  fullCard.addEventListener('click', ()=>startQuiz('__all__'));
+  quizGrid.appendChild(fullCard);
+
+  SCIENTISTS.forEach((s,idx)=>{
+    const bank = QUIZ_BANK[s.id] || [];
+    const card = document.createElement('div');
+    card.className = 'quiz-card';
+    card.innerHTML = `
+      <div class="medallion" style="${medallionStyle(s)};width:56px;height:56px;font-size:1.3rem;margin-bottom:14px;">${initials(s.short)}${medallionImg(s)}</div>
+      <h4 style="font-size:1.05rem;">${s.name}</h4>
+      <div class="qcount">${bank.length} أسئلة · مستويات متدرجة</div>
+      <div class="qgo">ابدأ الاختبار ←</div>
+    `;
+    card.addEventListener('click', ()=>startQuiz(s.id));
+    quizGrid.appendChild(card);
+    gsap.to(card, {opacity:1, y:0, duration:.5, delay:idx*.03, ease:'power3.out',
+      scrollTrigger:{trigger:card, start:'top 92%'}});
+  });
+}
+renderQuizGrid();
+
+let currentQuiz = null; // {title, questions:[{q,choices,correctText,level,scientistId}], answers:[]}
+
+function buildComprehensiveQuiz(){
+  let pool = [];
+  Object.entries(QUIZ_BANK).forEach(([sid,qs])=>{
+    shuffle(qs).slice(0,3).forEach(q=> pool.push({...q, scientistId:sid}));
+  });
+  return shuffle(pool);
+}
+
+function startQuiz(id){
+  let title, rawQuestions;
+  if(id === '__all__'){
+    title = 'الاختبار الشامل — كل العلماء';
+    rawQuestions = buildComprehensiveQuiz();
+  } else {
+    const s = byId(id);
+    title = 'اختبار: ' + s.name;
+    rawQuestions = QUIZ_BANK[id] || [];
+  }
+  const questions = rawQuestions.map(q=>{
+    const correctText = q.choices[q.correct];
+    const shuffledChoices = shuffle(q.choices);
+    return {
+      q:q.q, level:q.level, scientistId:q.scientistId,
+      choices:shuffledChoices, correctText
+    };
+  });
+  currentQuiz = {title, sourceId:id, questions, current:0, answers:new Array(questions.length).fill(null)};
+  quizGrid.style.display = 'none';
+  document.querySelector('#quizzes .sec-head').style.display = 'none';
+  renderQuizQuestion();
+  requestAnimationFrame(()=> document.getElementById('quizzes').scrollIntoView({behavior:'smooth', block:'start'}));
+}
+
+function renderQuizQuestion(){
+  const quiz = currentQuiz;
+  const i = quiz.current;
+  const q = quiz.questions[i];
+  const picked = quiz.answers[i];
+  const answered = picked !== null && picked !== undefined;
+  const pct = Math.round((i/quiz.questions.length)*100);
+  quizStage.innerHTML = `
+    <div class="quiz-stage-panel">
+      <div class="quiz-meta-row">
+        <span>${quiz.title}</span>
+        <span>سؤال ${i+1} من ${quiz.questions.length} &nbsp;·&nbsp; <span class="quiz-level-tag">${q.level}</span></span>
+      </div>
+      <div class="quiz-progress"><div class="quiz-progress-bar" style="width:${pct}%"></div></div>
+      <div class="quiz-question">${q.q}</div>
+      <div class="quiz-options">
+        ${q.choices.map((c,ci)=>{
+          let cls = '';
+          if(answered){
+            if(c === q.correctText) cls = ' correct-answer';
+            else if(c === picked) cls = ' wrong-answer';
+            cls += ' locked';
+          } else if(picked===c) cls = ' picked';
+          return `<div class="quiz-opt${cls}" data-choice="${ci}">${c}${answered && c===q.correctText ? ' ✔':''}${answered && c===picked && picked!==q.correctText ? ' ✘':''}</div>`;
+        }).join('')}
+      </div>
+      ${answered ? `<p style="color:${picked===q.correctText?'#a4e0a4':'#f0c4b4'};font-size:.92rem;margin-bottom:22px;">${picked===q.correctText?'إجابة صحيحة! أحسنت.':'إجابة غير صحيحة — الإجابة الصحيحة موضّحة أعلاه.'}</p>` : ''}
+      <div class="quiz-nav-row">
+        <span class="quiz-exit" id="quiz-exit-btn">إنهاء والخروج</span>
+        <button class="btn-primary" id="quiz-next-btn" ${answered?'':'disabled style="opacity:.4;pointer-events:none;"'}>${i===quiz.questions.length-1?'عرض النتيجة':'السؤال التالي'}</button>
+      </div>
+    </div>
+  `;
+  if(!answered){
+    quizStage.querySelectorAll('.quiz-opt').forEach(opt=>{
+      opt.addEventListener('click', ()=>{
+        quiz.answers[i] = q.choices[+opt.dataset.choice];
+        renderQuizQuestion();
+      });
+    });
+  }
+  const nextBtn = document.getElementById('quiz-next-btn');
+  nextBtn.addEventListener('click', ()=>{
+    if(i === quiz.questions.length-1){ renderQuizResults(); }
+    else { quiz.current++; renderQuizQuestion(); }
+  });
+  document.getElementById('quiz-exit-btn').addEventListener('click', ()=>{
+    exitQuizToGrid();
+  });
+}
+
+function exitQuizToGrid(){
+  currentQuiz = null; quizStage.innerHTML = '';
+  quizGrid.style.display = '';
+  document.querySelector('#quizzes .sec-head').style.display = '';
+  document.getElementById('quizzes').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function levelForScore(pct){
+  if(pct >= 85) return {cls:'level-excellent', label:'ممتاز', msg:'مستوى معرفي ممتاز بتاريخ هذا العالِم — إتقان واضح للتفاصيل.'};
+  if(pct >= 70) return {cls:'level-good', label:'جيد جدًا', msg:'فهم قوي للمعلومات الأساسية، مع بعض التفاصيل التي تستحق مراجعة سريعة.'};
+  if(pct >= 50) return {cls:'level-fair', label:'مقبول', msg:'أساس جيد، لكن يُنصح بمراجعة صفحة العالِم لتثبيت التفاصيل الدقيقة.'};
+  return {cls:'level-weak', label:'يحتاج مراجعة', msg:'يُفضّل قراءة الصفحة التفصيلية لهذا العالِم ثم إعادة المحاولة.'};
+}
+
+function renderQuizResults(){
+  const quiz = currentQuiz;
+  const total = quiz.questions.length;
+  let correct = 0;
+  const byLevel = {'سهل':{c:0,t:0},'متوسط':{c:0,t:0},'صعب':{c:0,t:0}};
+  quiz.questions.forEach((q,i)=>{
+    const isCorrect = quiz.answers[i] === q.correctText;
+    if(isCorrect) correct++;
+    byLevel[q.level].t++;
+    if(isCorrect) byLevel[q.level].c++;
+  });
+  const pct = Math.round((correct/total)*100);
+  const lvl = levelForScore(pct);
+
+  quizStage.innerHTML = `
+    <div class="quiz-results">
+      <div class="score-ring-wrap">
+        <div class="score-big">${correct} / ${total}</div>
+        <div class="score-level ${lvl.cls}">المستوى: ${lvl.label} (${pct}٪)</div>
+        <p class="score-sub">${lvl.msg}</p>
+      </div>
+      <div class="level-breakdown">
+        ${Object.entries(byLevel).filter(([,v])=>v.t>0).map(([lv,v])=>`
+          <div class="lb-item">
+            <div class="n">${v.c}/${v.t}</div>
+            <div class="l">أسئلة ${lv}</div>
+          </div>
+        `).join('')}
+      </div>
+      <h3 style="margin-bottom:18px;color:var(--gold-bright);">مراجعة الإجابات</h3>
+      ${quiz.questions.map((q,i)=>{
+        const isCorrect = quiz.answers[i] === q.correctText;
+        return `
+        <div class="review-item">
+          <div class="rq"><span>${i+1}. ${q.q}</span><span class="tag">${q.level}</span></div>
+          <div class="ra ${isCorrect?'ok':'bad'}">إجابتك: ${quiz.answers[i] ?? '—'} ${isCorrect?'✔':'✘'}</div>
+          ${!isCorrect?`<div class="ra ok">الإجابة الصحيحة: ${q.correctText}</div>`:''}
+        </div>`;
+      }).join('')}
+      <div class="quiz-actions">
+        <button class="btn-primary" id="quiz-retry-btn">إعادة المحاولة</button>
+        <button class="btn-ghost" id="quiz-back-btn">العودة لقائمة الاختبارات</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('quiz-retry-btn').addEventListener('click', ()=>{
+    startQuiz(quiz.sourceId);
+  });
+  document.getElementById('quiz-back-btn').addEventListener('click', ()=>{
+    exitQuizToGrid();
+  });
+}
+
+/* ============ scroll animations ============ */
+gsap.registerPlugin(ScrollTrigger);
+gsap.timeline()
+  .to('.hero-eyebrow',{opacity:1,y:0,duration:.7,ease:'power3.out'},0.1)
+  .fromTo('.hero h1',{opacity:0,y:40},{opacity:1,y:0,duration:1,ease:'power3.out'},0.25)
+  .to('.hero-sub',{opacity:1,duration:.8,ease:'power2.out'},0.6)
+  .to('.hero-cta',{opacity:1,duration:.8,ease:'power2.out'},0.8)
+  .to('.scroll-cue',{opacity:1,duration:.6},1.1);
+
+document.querySelectorAll('.reveal').forEach(elx=>{
+  gsap.to(elx,{opacity:1,y:0,duration:.8,ease:'power3.out',
+    scrollTrigger:{trigger:elx, start:'top 85%'}});
+});
+document.querySelectorAll('.era').forEach(elx=>{
+  gsap.to(elx,{opacity:1,y:0,duration:.9,ease:'power3.out',
+    scrollTrigger:{trigger:elx, start:'top 82%'}});
+});
+
+/* nav active link on scroll */
+const navLinks = document.querySelectorAll('.nav-links a');
+const sectionEls = ['hero','timeline','scientists','network','compare','map','quizzes'].map(id=>document.getElementById(id));
+ScrollTrigger.batch(sectionEls, {
+  onEnter: batch => {},
+});
+sectionEls.forEach(sec=>{
+  ScrollTrigger.create({
+    trigger: sec, start:'top 50%', end:'bottom 50%',
+    onToggle: self=>{
+      if(self.isActive){
+        navLinks.forEach(l=>l.classList.remove('active'));
+        const match = document.querySelector(`.nav-links a[href="#${sec.id}"]`);
+        if(match) match.classList.add('active');
+      }
+    }
+  });
+});
+
+/* smooth nav-search enter jumps to scientists section */
+document.getElementById('global-search').addEventListener('keydown', e=>{
+  if(e.key==='Enter'){ document.getElementById('scientists').scrollIntoView({behavior:'smooth'}); }
+});
+
+/* ============ mobile menu toggle ============ */
+(function(){
+  const nav = document.getElementById('main-nav');
+  const burger = document.getElementById('burger-btn');
+  burger.addEventListener('click', ()=>{
+    const isOpen = nav.classList.toggle('menu-open');
+    burger.classList.toggle('open', isOpen);
+  });
+  document.querySelectorAll('.nav-links a').forEach(a=>{
+    a.addEventListener('click', ()=>{
+      nav.classList.remove('menu-open');
+      burger.classList.remove('open');
+    });
+  });
+})();
+</script>
+</body>
+</html>
