@@ -396,6 +396,57 @@ footer .brand{justify-content:center;margin-bottom:16px;color:var(--text-2);}
 footer .credit-line{margin-top:16px;font-size:.78rem;color:var(--text-3);letter-spacing:.3px;}
 footer .credit-line + .credit-line{margin-top:4px;}
 
+/* ===== course info section ===== */
+.info-sub-title{text-align:center;font-family:'Amiri',serif;font-size:1.3rem;color:var(--gold-bright);margin:56px 0 26px;}
+.info-quick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px;max-width:1200px;margin:0 auto;}
+.info-quick{background:var(--glass);border:1px solid var(--glass-brd);border-radius:18px;padding:24px;text-align:center;}
+.info-quick .iq-ico{font-size:1.8rem;display:block;margin-bottom:10px;}
+.info-quick b{display:block;font-size:1rem;margin-bottom:8px;color:var(--text-1);}
+.info-quick p{color:var(--text-2);font-size:.86rem;font-weight:300;line-height:1.7;}
+
+.grading-wrap{max-width:640px;margin:0 auto;}
+.gbar{display:flex;align-items:center;gap:16px;margin-bottom:16px;}
+.gbar-label{width:110px;flex:none;font-size:.9rem;color:var(--text-2);}
+.gbar-track{flex:1;height:30px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--glass-brd);overflow:hidden;}
+.gbar-fill{height:100%;display:flex;align-items:center;justify-content:flex-start;padding-right:14px;
+  background:linear-gradient(120deg,var(--gold),var(--gold-bright));color:#0b0e1c;font-weight:800;font-size:.82rem;border-radius:999px;}
+.gbar-fill.teal{background:linear-gradient(120deg,var(--teal),#7fd6cf);}
+.grading-chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:22px;}
+
+.grading-detail{display:flex;align-items:center;justify-content:center;gap:50px;flex-wrap:wrap;max-width:700px;margin:38px auto 0;}
+.donut{width:190px;height:190px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 20px 50px -20px rgba(0,0,0,.6);flex:none;}
+.donut::before{content:"";position:absolute;inset:24px;background:var(--bg-deep);border-radius:50%;}
+.donut-center{position:relative;text-align:center;z-index:2;}
+.donut-center b{display:block;font-size:1.9rem;color:var(--text-1);}
+.donut-center span{font-size:.7rem;color:var(--text-3);}
+.donut-legend{display:flex;flex-direction:column;gap:14px;}
+.dl-item{display:flex;align-items:center;gap:10px;font-size:.9rem;color:var(--text-2);white-space:nowrap;}
+.dl-item b{color:var(--text-1);}
+.dl-item i{color:var(--text-3);font-style:normal;font-size:.78rem;}
+.dl-dot{width:12px;height:12px;border-radius:50%;flex:none;}
+
+.course-timeline{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:18px;}
+.ct-item{display:flex;gap:18px;align-items:flex-start;background:var(--glass);border:1px solid var(--glass-brd);border-radius:16px;padding:18px 22px;}
+.ct-badge{flex:none;width:44px;height:44px;border-radius:50%;background:linear-gradient(120deg,var(--gold),var(--gold-bright));
+  color:#0b0e1c;font-weight:800;font-size:.85rem;display:flex;align-items:center;justify-content:center;}
+.ct-item b{display:block;margin-bottom:6px;color:var(--text-1);font-size:1rem;}
+.ct-item p{color:var(--text-2);font-size:.86rem;font-weight:300;line-height:1.7;}
+
+.bonus-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;max-width:900px;margin:0 auto;}
+.bonus-card{background:var(--glass);border:1px solid var(--glass-brd);border-radius:18px;padding:26px;}
+.bonus-card h4{font-size:1.1rem;margin-bottom:14px;color:var(--gold-bright);}
+.bonus-card ul{padding-right:20px;color:var(--text-2);font-size:.87rem;font-weight:300;line-height:1.8;list-style:disc;}
+
+.faq-list{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:10px;}
+.faq-list details{background:var(--glass);border:1px solid var(--glass-brd);border-radius:14px;padding:16px 22px;}
+.faq-list summary{cursor:pointer;font-weight:700;color:var(--text-1);font-size:.95rem;}
+.faq-list p{margin-top:10px;color:var(--text-2);font-size:.87rem;font-weight:300;line-height:1.7;}
+
+.tips-card{max-width:760px;margin:36px auto 0;background:var(--glass);border:1px solid var(--gold);border-radius:18px;padding:26px 30px;}
+.tips-card h4{margin-bottom:12px;color:var(--gold-bright);font-size:1.05rem;}
+.tips-card ul{padding-right:20px;color:var(--text-2);font-size:.88rem;font-weight:300;line-height:1.8;list-style:disc;}
+
 /* ===== dedication ===== */
 .dedication-card{
   max-width:460px;margin:0 auto;text-align:center;background:var(--glass);border:1px solid var(--glass-brd);
@@ -489,6 +540,15 @@ footer .credit-line + .credit-line{margin-top:4px;}
   footer{padding:50px 5vw 36px;}
   .dedication-card{padding:36px 24px;}
   .dedication-photo{width:110px;height:110px;}
+  .info-sub-title{font-size:1.15rem;margin:44px 0 20px;}
+  .gbar{flex-direction:column;align-items:stretch;gap:6px;}
+  .gbar-label{width:auto;}
+  .ct-item{padding:16px 18px;gap:14px;}
+  .bonus-card{padding:20px;}
+  .donut{width:150px;height:150px;}
+  .donut::before{inset:18px;}
+  .donut-center b{font-size:1.5rem;}
+  .grading-detail{gap:28px;}
 }
 
 @media(max-width:480px){
@@ -529,6 +589,7 @@ footer .credit-line + .credit-line{margin-top:4px;}
   </div>
   <div class="nav-links">
     <a href="#hero" class="active">الرئيسية</a>
+    <a href="#course-info">معلومات المقرر</a>
     <a href="#timeline">الخط الزمني</a>
     <a href="#scientists">العلماء</a>
     <a href="#network">الشبكة العلمية</a>
@@ -555,6 +616,101 @@ footer .credit-line + .credit-line{margin-top:4px;}
 </header>
 
 <main>
+
+<section id="dedication">
+  <div class="sec-head reveal">
+    <div class="sec-eyebrow"><span class="ln"></span>إهداء خاص<span class="ln"></span></div>
+    <h2 class="sec-title">بكل <em>تقدير</em> ومحبة</h2>
+  </div>
+  <div class="dedication-card reveal">
+    <div class="dedication-photo">
+      <img src="https://i1.rgstatic.net/ii/profile.image/272262750273565-1441923906729_Q512/Morsy-Abu-Youssef.jpg" alt="د. مرسي أبو يوسف" loading="lazy" onerror="this.closest('.dedication-photo').style.display='none'">
+    </div>
+    <h3>د. مرسي أبو يوسف</h3>
+    <p class="dedication-text">هذا العمل إهداء بسيط، تعبيرًا عن خالص الشكر والتقدير والمحبة، على كل ما قدّمتموه من علم وتوجيه ودعم.</p>
+  </div>
+</section>
+
+<div class="geo-divider"><span></span><span class="bar"></span><span></span><span class="bar"></span><span></span></div>
+
+<section id="course-info">
+  <div class="sec-head reveal">
+    <div class="sec-eyebrow"><span class="ln"></span>متطلب جامعة<span class="ln"></span></div>
+    <h2 class="sec-title">معلومات <em>المقرر</em></h2>
+    <p class="sec-desc">كل تفاصيل مادة تاريخ العلوم في مكان واحد — المواعيد، الدرجات، والبونص.</p>
+  </div>
+
+  <div class="info-quick-grid reveal">
+    <div class="info-quick"><span class="iq-ico">⏳</span><b>مدة الكورس</b><p>14 محاضرة، وفي الصيفي 7 أسابيع (محاضرتين أسبوعيًا: الإثنين والأربعاء)</p></div>
+    <div class="info-quick"><span class="iq-ico">📖</span><b>الكتاب</b><p>متوفر في مكتبة الإيمان أمام كلية العلوم بمحرم بك (عدد محدود) — إحضاره ضروري لتفعيل نظام Open Book</p></div>
+    <div class="info-quick"><span class="iq-ico">🗓️</span><b>مواعيد المحاضرات</b><p>الإثنين: 10:00 – 12:00 — مدرج 5<br>الأربعاء: 9:00 – 11:00 — مدرج 5</p></div>
+  </div>
+
+  <h3 class="info-sub-title reveal">توزيع الدرجات</h3>
+  <div class="grading-wrap reveal">
+    <div class="gbar"><span class="gbar-label">أعمال السنة</span><div class="gbar-track"><div class="gbar-fill" style="width:40%">40</div></div></div>
+    <div class="gbar"><span class="gbar-label">الفاينل</span><div class="gbar-track"><div class="gbar-fill teal" style="width:60%">60</div></div></div>
+  </div>
+
+  <h3 class="info-sub-title reveal">تفصيل أعمال السنة (40 درجة)</h3>
+  <div class="grading-detail reveal">
+    <div class="donut" style="background:conic-gradient(var(--gold) 0% 50%, var(--teal) 50% 62.5%, var(--rose) 62.5% 75%, var(--gold-bright) 75% 100%);">
+      <div class="donut-center"><b>40</b><span>درجة</span></div>
+    </div>
+    <div class="donut-legend">
+      <div class="dl-item"><span class="dl-dot" style="background:var(--gold)"></span>ميدترم <b>20</b> <i>(50%)</i></div>
+      <div class="dl-item"><span class="dl-dot" style="background:var(--teal)"></span>كويز 1 <b>5</b> <i>(12.5%)</i></div>
+      <div class="dl-item"><span class="dl-dot" style="background:var(--rose)"></span>كويز 2 <b>5</b> <i>(12.5%)</i></div>
+      <div class="dl-item"><span class="dl-dot" style="background:var(--gold-bright)"></span>شفوي <b>10</b> <i>(25%)</i></div>
+    </div>
+  </div>
+
+  <h3 class="info-sub-title reveal">جدول التقييم أثناء الترم</h3>
+  <div class="course-timeline reveal">
+    <div class="ct-item"><span class="ct-badge">م4</span><div><b>كويز 1 (5 درجات)</b><p>عن العلماء المدروسين في أول 4 محاضرات — السؤال غالبًا: اكتب ما تعرفه عن 3 أو 4 علماء. عمل Presentation يعطي نفس الدرجة بدلًا منه.</p></div></div>
+    <div class="ct-item"><span class="ct-badge">م7</span><div><b>Midterm (20 درجة)</b><p>ليس Open Book — كتابة معلومات عن 5 علماء تمت دراستهم حتى الميدترم.</p></div></div>
+    <div class="ct-item"><span class="ct-badge">م10</span><div><b>كويز 2 (5 درجات)</b><p>يمكن الحصول على درجاته عن طريق Presentation.</p></div></div>
+    <div class="ct-item"><span class="ct-badge">م11</span><div><b>شفوي (10 درجات)</b><p>يمكن الحصول على درجاته عن طريق Poster. عند وجود الاثنين، تُحتسب الدرجة الأعلى.</p></div></div>
+  </div>
+
+  <h3 class="info-sub-title reveal">بونص اختياري</h3>
+  <div class="bonus-grid reveal">
+    <div class="bonus-card">
+      <h4>🎤 Presentation</h4>
+      <ul>
+        <li>غير إجباري — 5 درجات بدل الكويز، وممكن عمل واحد تاني بدل كويز 2</li>
+        <li>اقرأ عن العالم (كتاب/إنترنت/AI) واعمل PowerPoint بسيط</li>
+        <li>اتكلم عن: مين هو؟ درس إيه؟ اكتشف إيه؟ إفادته للعلم والبشرية؟ ليه لسه معروف؟</li>
+        <li>الشكل مش مهم، المهم الفهم والشرح — وممنوع تكرار نفس العالم</li>
+      </ul>
+    </div>
+    <div class="bonus-card">
+      <h4>🖼️ Poster</h4>
+      <ul>
+        <li>غير إجباري — فردي حتى 10 درجات، اثنين حتى 8 لكل طالب، وتقل كل ما زاد العدد</li>
+        <li>التسجيل: الاسم، موضوع البوستر، فردي أو جماعي، وموعد التقديم لمسؤولة البوستر</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="info-sub-title reveal">أسئلة متكررة</h3>
+  <div class="faq-list reveal">
+    <details><summary>هل لازم أعمل Presentation؟</summary><p>لا، مش إجباري — تقدر تدخل الكويز بشكل طبيعي.</p></details>
+    <details><summary>هل لازم أعمل Poster؟</summary><p>لا، مش إجباري — تقدر تدخل الشفوي بشكل طبيعي.</p></details>
+    <details><summary>هل الكتاب ضروري؟</summary><p>نعم، ضروري جدًا خصوصًا لتفعيل نظام Open Book في الكويزات.</p></details>
+  </div>
+
+  <div class="tips-card reveal">
+    <h4>💡 نصائح الدكتور</h4>
+    <ul>
+      <li>الحضور + قراءة الكتاب + المشاركة = فرصة كبيرة للحصول على A</li>
+      <li>الحضور والمذاكرة بدون مشاركة كمان بيدّوا درجة كويسة</li>
+      <li>الغياب وعدم المذاكرة وعدم إحضار الكتاب هيأثروا على مستواك ودرجتك</li>
+    </ul>
+  </div>
+</section>
+
+<div class="geo-divider"><span></span><span class="bar"></span><span></span><span class="bar"></span><span></span></div>
 
 <section id="timeline">
   <div class="sec-head reveal">
@@ -645,22 +801,6 @@ footer .credit-line + .credit-line{margin-top:4px;}
   </div>
   <div class="grid-scientists" id="quiz-grid"></div>
   <div id="quiz-stage"></div>
-</section>
-
-<div class="geo-divider"><span></span><span class="bar"></span><span></span><span class="bar"></span><span></span></div>
-
-<section id="dedication">
-  <div class="sec-head reveal">
-    <div class="sec-eyebrow"><span class="ln"></span>إهداء خاص<span class="ln"></span></div>
-    <h2 class="sec-title">بكل <em>تقدير</em> ومحبة</h2>
-  </div>
-  <div class="dedication-card reveal">
-    <div class="dedication-photo">
-      <img src="https://i1.rgstatic.net/ii/profile.image/272262750273565-1441923906729_Q512/Morsy-Abu-Youssef.jpg" alt="د. مرسي أبو يوسف" loading="lazy" onerror="this.closest('.dedication-photo').style.display='none'">
-    </div>
-    <h3>د. مرسي أبو يوسف</h3>
-    <p class="dedication-text">هذا العمل إهداء بسيط، تعبيرًا عن خالص الشكر والتقدير والمحبة، على كل ما قدّمتموه من علم وتوجيه ودعم.</p>
-  </div>
 </section>
 
 </main>
@@ -1882,7 +2022,7 @@ document.querySelectorAll('.era').forEach(elx=>{
 
 /* nav active link on scroll */
 const navLinks = document.querySelectorAll('.nav-links a');
-const sectionEls = ['hero','timeline','scientists','network','compare','map','quizzes'].map(id=>document.getElementById(id));
+const sectionEls = ['hero','course-info','timeline','scientists','network','compare','map','quizzes'].map(id=>document.getElementById(id));
 ScrollTrigger.batch(sectionEls, {
   onEnter: batch => {},
 });
